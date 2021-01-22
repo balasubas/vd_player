@@ -1,4 +1,0 @@
-com/player/vd/PlayerMain.java
- com.player.vd.PlayerMain
-com/player/component/SampleComponent.java
- com.player.component.SampleComponent
