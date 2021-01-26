@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.3.8.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'java'
 }
 
@@ -8,12 +9,39 @@ group 'org.vd.player'
 version '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 
+enum Versions {
+
+    JFX_CONTROLS('11.0.2')
+
+    Versions(String value){
+        this.value = value
+    }
+
+    String getValue(){
+        return value
+    }
+
+    String value
+}
+
+javafx {
+    //From: https://github.com/openjfx/javafx-gradle-plugin
+    version = '11'
+    modules = [ 'javafx.base','javafx.graphics','javafx.controls','javafx.fxml','javafx.swing','javafx.web' ]
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+
+    compile 'org.openjfx:javafx-controls:' + Versions.JFX_CONTROLS.value
+    compile 'org.openjfx:javafx-base:' + Versions.JFX_CONTROLS.value
+    compile 'org.openjfx:javafx-graphics:' + Versions.JFX_CONTROLS.value
+    compile 'org.openjfx:javafx-swing:' + Versions.JFX_CONTROLS.value
+    compile 'org.openjfx:javafx-fxml:' + Versions.JFX_CONTROLS.value
+    compile 'org.openjfx:javafx-web:' + Versions.JFX_CONTROLS.value
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.3.8.RELEASE'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
