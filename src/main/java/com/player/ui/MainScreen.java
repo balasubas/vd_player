@@ -1,11 +1,11 @@
 package com.player.ui;
 
 import com.player.utils.ApplicationProperties;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.nio.file.Paths;
  *
  * **/
 
-public class MainScreen {
+public class MainScreen implements ParentScreen {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
@@ -31,32 +31,34 @@ public class MainScreen {
     @Qualifier("appProperties")
     private ApplicationProperties appProperties;
 
-    private double leftPaneWidth = 250;
+    private double leftPaneWidth = 220;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
 
         Stage primaryStage = new Stage();
-        Button closeBtn = new Button("Close");
+        Button pause = new Button("Pause");
+        Button stop = new Button("Stop");
+        Button rewind = new Button("Back");
+        Button play = new Button("Play");
+        Button fastForward = new Button("Forward");
 
+        VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
+        Button open = new Button("+");
+        open.setId("open-btn");
+        open.setTooltip(buildToolTip(appProperties.getOpenBtnToolTip(),null));
 
-        VBox leftSide = new VBox(new Label("Left Side"));
+        leftSide.getChildren().add(open);
         leftSide.setMaxWidth(leftPaneWidth);
         leftSide.setMinWidth(leftPaneWidth);
 
-        VBox rightSide = new VBox(new Label("Right Side"));
-        HBox hBox = new HBox();
-        hBox.setId("hbox-main");
-        hBox.getChildren().addAll(closeBtn);
+        VBox rightSide = new VBox(new Label("Now Playing ... "));
+        HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),appProperties.getHboxWidth(),Pos.BASELINE_CENTER);
+        hBox.getChildren().addAll(pause,rewind,play,fastForward,stop);
 
 
         GridPane gridPane = new GridPane();
         gridPane.setMinHeight(430);
-        gridPane.addRow(0,new Label("Media"));
-        gridPane.addRow(1,new Label("Media"));
-        gridPane.addRow(2,new Label("Media"));
-        gridPane.addRow(3,new Label("Media"));
-        gridPane.addRow(4,new Label("Media"));
 
         rightSide.getChildren().addAll(gridPane,hBox);
 
@@ -67,7 +69,25 @@ public class MainScreen {
         scene.getStylesheets().add(appProperties.getStyleSheet());
         primaryStage.setScene(scene);
         primaryStage.setTitle(appProperties.getMainTitle());
+        primaryStage.setResizable(false);
+
         return primaryStage;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private VBox configureLeftPanel(VBox vBox){
+        TableView<String> tableView = new TableView<>();
+        tableView.setMinHeight(250.00);
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<String,String> column = new TableColumn<>();
+        column.setCellValueFactory((cellData)->{ return new ReadOnlyStringWrapper(cellData.getValue());});
+        tableView.getColumns().add(column);
+
+        vBox.getChildren().add(tableView);
+        vBox.setSpacing(10);
+
+        return vBox;
     }
 
 }

@@ -25,6 +25,15 @@ public class ApplicationProperties {
     @Value("${css.file}")
     private String cssSubdir;
 
+    @Value("${hbox.height}")
+    private int hboxHeight;
+
+    @Value("${hbox.width}")
+    private int hboxWidth;
+
+    @Value("${open.btn.tooltip}")
+    private String openBtnToolTip;
+
     //////////////////////////////////////////////////////////////////////////
     public int getStdHeight() {
         return stdHeight;
@@ -44,4 +53,18 @@ public class ApplicationProperties {
         return "file:///" + path.toAbsolutePath().toString();
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    public int getHboxHeight(){
+        return hboxHeight;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public int getHboxWidth() {
+        return hboxWidth;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public String getOpenBtnToolTip() {
+        return openBtnToolTip;
+    }
 }
