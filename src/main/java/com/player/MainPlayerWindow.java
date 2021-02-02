@@ -22,8 +22,8 @@ public class MainPlayerWindow extends Application {
     private static MainScreen mainScreen =
             (MainScreen) applicationContext.getBean("mainScreen");
 
-    private static ApplicationProperties appProperties =
-            (ApplicationProperties) applicationContext.getBean("appProperties");
+//    private static ApplicationProperties appProperties =
+//            (ApplicationProperties) applicationContext.getBean("appProperties");
 
     //////////////////////////////////////////////////////////////////////////
     @Override
@@ -34,7 +34,7 @@ public class MainPlayerWindow extends Application {
 
     //////////////////////////////////////////////////////////////////////////
     public static void main(String ... args){
-        launch(args);
+            launch(args);
     }
     
 }

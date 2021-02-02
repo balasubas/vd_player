@@ -14,7 +14,13 @@
 
 #open-btn{
   -fx-font-size: 18pt;
-  -fx-background: gray;
+  -fx-background-color: #1E90FF;
+}
+
+#ui-control {
+  -fx-border-color: black;
+  -fx-border-width: 1px;
+  -fx-background-color: #1E90FF;
 }
 
 TableView {

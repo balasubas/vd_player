@@ -34,6 +34,12 @@ public class ApplicationProperties {
     @Value("${open.btn.tooltip}")
     private String openBtnToolTip;
 
+    @Value("${image.dir}")
+    private String imageSubdir;
+
+    @Value("${icon.btn.fit.height}")
+    private int btnFitHeight;
+
     //////////////////////////////////////////////////////////////////////////
     public int getStdHeight() {
         return stdHeight;
@@ -67,4 +73,37 @@ public class ApplicationProperties {
     public String getOpenBtnToolTip() {
         return openBtnToolTip;
     }
+
+    //////////////////////////////////////////////////////////////////////////
+    public int getBtnFitHeight(){ return btnFitHeight; }
+
+    //////////////////////////////////////////////////////////////////////////
+    public String getLogo(String logoName){
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("file:///")
+          .append(System.getProperty("user.dir"))
+          .append("/")
+          .append(imageSubdir);
+
+        switch(logoName){
+            case "pause": sb.append("pause.png");
+                          break;
+
+            case "stop": sb.append("stop.png");
+                         break;
+
+            case "forward": sb.append("forward.png");
+                            break;
+
+            case "back": sb.append("back.png");
+                         break;
+
+            default: sb.append("play.png");
+                     break;
+        }
+
+        return sb.toString();
+    }
+
 }

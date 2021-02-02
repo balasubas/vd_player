@@ -6,19 +6,18 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 
 /**
  * TODO:
- *  1. Start styling this
- *  2. improve the layout
+ *   1. For the ui control buttons, you have to add back the css style for hover
+ *   and pressed. These disappear when adding background colors.
  *
  *
  * **/
@@ -35,14 +34,7 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
-
         Stage primaryStage = new Stage();
-        Button pause = new Button("Pause");
-        Button stop = new Button("Stop");
-        Button rewind = new Button("Back");
-        Button play = new Button("Play");
-        Button fastForward = new Button("Forward");
-
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
         open.setId("open-btn");
@@ -53,9 +45,7 @@ public class MainScreen implements ParentScreen {
         leftSide.setMinWidth(leftPaneWidth);
 
         VBox rightSide = new VBox(new Label("Now Playing ... "));
-        HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),appProperties.getHboxWidth(),Pos.BASELINE_CENTER);
-        hBox.getChildren().addAll(pause,rewind,play,fastForward,stop);
-
+        HBox hBox = configureVidControls();
 
         GridPane gridPane = new GridPane();
         gridPane.setMinHeight(430);
@@ -65,7 +55,7 @@ public class MainScreen implements ParentScreen {
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(leftSide,rightSide);
 
-        Scene scene =  new Scene(splitPane,appProperties.getStdWidth(), appProperties.getStdHeight());
+        Scene scene = new Scene(splitPane,appProperties.getStdWidth(), appProperties.getStdHeight());
         scene.getStylesheets().add(appProperties.getStyleSheet());
         primaryStage.setScene(scene);
         primaryStage.setTitle(appProperties.getMainTitle());
@@ -90,4 +80,31 @@ public class MainScreen implements ParentScreen {
         return vBox;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    private HBox configureVidControls(){
+        Button pause = setImage(new Button(), "pause","ui-control");
+        Button stop = setImage(new Button(), "stop","ui-control");
+        Button rewind = setImage(new Button(), "back", "ui-control");
+        Button play = setImage(new Button(), "play","ui-control");
+
+        Button fastForward = setImage(new Button(), "forward","ui-control");
+
+        HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),
+                                                appProperties.getHboxWidth(),
+                                                Pos.BASELINE_CENTER);
+        hBox.getChildren().addAll(pause,rewind,play,fastForward,stop);
+
+        return hBox;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private Button setImage(Button button, String imageName, String id){
+        Image img = new Image(appProperties.getLogo(imageName));
+        ImageView view = new ImageView(img);
+        view.setFitHeight(appProperties.getBtnFitHeight());
+        view.setPreserveRatio(true);
+        button.setGraphic(view);
+        button.setId(id);
+        return button;
+    }
 }
