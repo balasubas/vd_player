@@ -3,15 +3,20 @@ package com.player.ui;
 import com.player.utils.ApplicationProperties;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -30,13 +35,29 @@ public class MainScreen implements ParentScreen {
     @Qualifier("appProperties")
     private ApplicationProperties appProperties;
 
-    private double leftPaneWidth = 220;
+    private final double leftPaneWidth = 220;
+    private final double gridPaneHeight = 430;
+    private final double tableViewHeight = 250;
+    private final double spacing = 10;
+    private  FileChooser chooser;
+    private List<File> vidFiles;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
         Stage primaryStage = new Stage();
+        chooser = new FileChooser();
+        vidFiles = new ArrayList<>();
+
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
+        open.setOnAction((actionEvent)->{
+            List<File> temp = chooser.showOpenMultipleDialog(primaryStage);
+            if(Objects.nonNull(temp)) {
+                temp.stream().filter(Objects::nonNull)
+                            .forEach((file) -> vidFiles.add(file));
+            }
+        });
+
         open.setId("open-btn");
         open.setTooltip(buildToolTip(appProperties.getOpenBtnToolTip(),null));
 
@@ -48,7 +69,7 @@ public class MainScreen implements ParentScreen {
         HBox hBox = configureVidControls();
 
         GridPane gridPane = new GridPane();
-        gridPane.setMinHeight(430);
+        gridPane.setMinHeight(gridPaneHeight);
 
         rightSide.getChildren().addAll(gridPane,hBox);
 
@@ -66,16 +87,17 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     private VBox configureLeftPanel(VBox vBox){
+        //TODO: This needs refactored to display an icon and filename in each row.
         TableView<String> tableView = new TableView<>();
-        tableView.setMinHeight(250.00);
+        tableView.setMinHeight(tableViewHeight);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<String,String> column = new TableColumn<>();
-        column.setCellValueFactory((cellData)->{ return new ReadOnlyStringWrapper(cellData.getValue());});
+        column.setCellValueFactory((cellData)-> new ReadOnlyStringWrapper(cellData.getValue()));
         tableView.getColumns().add(column);
 
         vBox.getChildren().add(tableView);
-        vBox.setSpacing(10);
+        vBox.setSpacing(spacing);
 
         return vBox;
     }
@@ -86,6 +108,9 @@ public class MainScreen implements ParentScreen {
         Button stop = setImage(new Button(), "stop","ui-control");
         Button rewind = setImage(new Button(), "back", "ui-control");
         Button play = setImage(new Button(), "play","ui-control");
+        play.setOnAction((actionEvent)->{
+            System.out.println("Now Playing ... ");
+        });
 
         Button fastForward = setImage(new Button(), "forward","ui-control");
 

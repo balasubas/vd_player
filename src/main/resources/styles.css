@@ -23,6 +23,14 @@
   -fx-background-color: #1E90FF;
 }
 
+#ui-control:pressed {
+    -fx-background-color: white;
+}
+
+#open-btn:pressed {
+    -fx-background-color: white;
+}
+
 TableView {
   -fx-background-color:transparent;
   -fx-border-color: #2c3e50;
