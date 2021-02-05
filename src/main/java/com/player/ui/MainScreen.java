@@ -2,6 +2,8 @@ package com.player.ui;
 
 import com.player.utils.ApplicationProperties;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -10,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -40,13 +43,14 @@ public class MainScreen implements ParentScreen {
     private final double tableViewHeight = 250;
     private final double spacing = 10;
     private  FileChooser chooser;
-    private List<File> vidFiles;
+    private ObservableList<File> vidFiles;
+    private TableView<File> tableView;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
         Stage primaryStage = new Stage();
         chooser = new FileChooser();
-        vidFiles = new ArrayList<>();
+        vidFiles = FXCollections.observableArrayList();
 
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
@@ -56,6 +60,7 @@ public class MainScreen implements ParentScreen {
                 temp.stream().filter(Objects::nonNull)
                             .forEach((file) -> vidFiles.add(file));
             }
+            tableView.setItems(vidFiles);
         });
 
         open.setId("open-btn");
@@ -87,13 +92,45 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     private VBox configureLeftPanel(VBox vBox){
-        //TODO: This needs refactored to display an icon and filename in each row.
-        TableView<String> tableView = new TableView<>();
+        //TODO: Continue implementing. This should also display the filename in
+        // the tableview.
+        tableView = new TableView<>();
         tableView.setMinHeight(tableViewHeight);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//        tableView.setOnMouseClicked((evt)->{
+//            String select = tableView.getSelectionModel().getSelectedItem().getAbsolutePath();
+//            System.out.println(select + " <<<<< ");
+//        });
 
-        TableColumn<String,String> column = new TableColumn<>();
-        column.setCellValueFactory((cellData)-> new ReadOnlyStringWrapper(cellData.getValue()));
+        TableColumn<File,String> column = new TableColumn<>();
+        Callback<TableColumn<File, String>, TableCell<File, String>> cellFactory;
+        cellFactory = new Callback<TableColumn<File, String>, TableCell<File, String>>(){
+            @Override
+            public TableCell<File, String> call(TableColumn<File, String> col) {
+                ImageView imageview = new ImageView();
+                final TableCell tabCell = new TableCell(){
+                    @Override
+                    public void updateItem(Object item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                            if(!empty) {
+                                File imgFile = new File(appProperties.getThumbNail("stop"));
+                                Image image = new Image(imgFile.toURI().toString());
+                                imageview.setFitHeight(50.0);
+                                imageview.setFitWidth(75.0);
+                                imageview.setImage(image);
+                                setGraphic(imageview);
+                            }else{
+                                imageview.setImage(null);
+                            }
+                    }
+                };
+
+                return tabCell;
+            }
+        };
+
+        column.setCellFactory(cellFactory);
         tableView.getColumns().add(column);
 
         vBox.getChildren().add(tableView);

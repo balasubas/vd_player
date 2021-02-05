@@ -106,4 +106,32 @@ public class ApplicationProperties {
         return sb.toString();
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    public String getThumbNail( String thumbnail){
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(System.getProperty("user.dir"))
+          .append("/")
+          .append(imageSubdir);
+
+        switch(thumbnail){
+            case "pause": sb.append("pause.png");
+                break;
+
+            case "stop": sb.append("stop.png");
+                break;
+
+            case "forward": sb.append("forward.png");
+                break;
+
+            case "back": sb.append("back.png");
+                break;
+
+            default: sb.append("play.png");
+                break;
+        }
+
+        return sb.toString();
+    }
+
 }
