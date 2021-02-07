@@ -1,7 +1,6 @@
 package com.player;
 
 import com.player.ui.MainScreen;
-import com.player.utils.ApplicationProperties;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;

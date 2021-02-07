@@ -115,19 +115,8 @@ public class ApplicationProperties {
           .append(imageSubdir);
 
         switch(thumbnail){
-            case "pause": sb.append("pause.png");
-                break;
 
-            case "stop": sb.append("stop.png");
-                break;
-
-            case "forward": sb.append("forward.png");
-                break;
-
-            case "back": sb.append("back.png");
-                break;
-
-            default: sb.append("play.png");
+            default: sb.append("camera.png");
                 break;
         }
 

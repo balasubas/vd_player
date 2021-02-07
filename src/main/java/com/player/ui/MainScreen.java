@@ -1,5 +1,6 @@
 package com.player.ui;
 
+import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -7,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -43,8 +45,8 @@ public class MainScreen implements ParentScreen {
     private final double tableViewHeight = 250;
     private final double spacing = 10;
     private  FileChooser chooser;
-    private ObservableList<File> vidFiles;
-    private TableView<File> tableView;
+    private ObservableList<VideoFileWrapper> vidFiles;
+    private TableView<VideoFileWrapper> tableView;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
@@ -54,11 +56,12 @@ public class MainScreen implements ParentScreen {
 
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
+        //TODO: fix this. When multiple files are loaded, the last file row is repeated.
         open.setOnAction((actionEvent)->{
             List<File> temp = chooser.showOpenMultipleDialog(primaryStage);
             if(Objects.nonNull(temp)) {
                 temp.stream().filter(Objects::nonNull)
-                            .forEach((file) -> vidFiles.add(file));
+                            .forEach((file) -> vidFiles.add(wrapFile(file)));
             }
             tableView.setItems(vidFiles);
         });
@@ -92,46 +95,20 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     private VBox configureLeftPanel(VBox vBox){
-        //TODO: Continue implementing. This should also display the filename in
-        // the tableview.
         tableView = new TableView<>();
         tableView.setMinHeight(tableViewHeight);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        TableView.TableViewSelectionModel<VideoFileWrapper> selectionModel = tableView.getSelectionModel();
+        selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
+        tableView.setSelectionModel(selectionModel);
+
+
 //        tableView.setOnMouseClicked((evt)->{
 //            String select = tableView.getSelectionModel().getSelectedItem().getAbsolutePath();
 //            System.out.println(select + " <<<<< ");
 //        });
 
-        TableColumn<File,String> column = new TableColumn<>();
-        Callback<TableColumn<File, String>, TableCell<File, String>> cellFactory;
-        cellFactory = new Callback<TableColumn<File, String>, TableCell<File, String>>(){
-            @Override
-            public TableCell<File, String> call(TableColumn<File, String> col) {
-                ImageView imageview = new ImageView();
-                final TableCell tabCell = new TableCell(){
-                    @Override
-                    public void updateItem(Object item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                            if(!empty) {
-                                File imgFile = new File(appProperties.getThumbNail("stop"));
-                                Image image = new Image(imgFile.toURI().toString());
-                                imageview.setFitHeight(50.0);
-                                imageview.setFitWidth(75.0);
-                                imageview.setImage(image);
-                                setGraphic(imageview);
-                            }else{
-                                imageview.setImage(null);
-                            }
-                    }
-                };
-
-                return tabCell;
-            }
-        };
-
-        column.setCellFactory(cellFactory);
-        tableView.getColumns().add(column);
+        configTableColumns();
 
         vBox.getChildren().add(tableView);
         vBox.setSpacing(spacing);
@@ -168,5 +145,48 @@ public class MainScreen implements ParentScreen {
         button.setGraphic(view);
         button.setId(id);
         return button;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private void configTableColumns(){
+
+        TableColumn<VideoFileWrapper,String> iconColumn = new TableColumn<>();
+        Callback<TableColumn<VideoFileWrapper, String>, TableCell<VideoFileWrapper, String>> cellFactory;
+        cellFactory = new Callback<TableColumn<VideoFileWrapper, String>, TableCell<VideoFileWrapper, String>>(){
+            @Override
+            public TableCell<VideoFileWrapper, String> call(TableColumn<VideoFileWrapper, String> col) {
+                ImageView imageview = new ImageView();
+                final TableCell tabCell = new TableCell(){
+                    @Override
+                    public void updateItem(Object item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if(!empty) {
+                            VideoFileWrapper videoFileWrapper =
+                                    ((VideoFileWrapper) getTableRow().getItem());
+                            File imgFile = videoFileWrapper.getIcon();
+                            Image image = new Image(imgFile.toURI().toString());
+                            imageview.setFitHeight(50.0);
+                            imageview.setFitWidth(75.0);
+                            imageview.setImage(image);
+                            setGraphic(imageview);
+                            setText(videoFileWrapper.getVideoFile().getName());
+                        }else{
+                            imageview.setImage(null);
+                        }
+                    }
+                };
+
+                return tabCell;
+            }
+        };
+
+        iconColumn.setCellFactory(cellFactory);
+        tableView.getColumns().add(iconColumn);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private VideoFileWrapper wrapFile(File file){
+        return new VideoFileWrapper(new File(appProperties.getThumbNail("camera")), file);
     }
 }
