@@ -40,6 +40,9 @@ public class ApplicationProperties {
     @Value("${icon.btn.fit.height}")
     private int btnFitHeight;
 
+    @Value("${clear.btn.tooltip}")
+    private String clearBtnToolTip;
+
     //////////////////////////////////////////////////////////////////////////
     public int getStdHeight() {
         return stdHeight;
@@ -121,6 +124,11 @@ public class ApplicationProperties {
         }
 
         return sb.toString();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public String getClearBtnToolTip(){
+        return clearBtnToolTip;
     }
 
 }

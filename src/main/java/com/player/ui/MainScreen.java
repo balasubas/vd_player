@@ -45,31 +45,45 @@ public class MainScreen implements ParentScreen {
     private final double tableViewHeight = 250;
     private final double spacing = 10;
     private  FileChooser chooser;
-    private ObservableList<VideoFileWrapper> vidFiles;
     private TableView<VideoFileWrapper> tableView;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
         Stage primaryStage = new Stage();
         chooser = new FileChooser();
-        vidFiles = FXCollections.observableArrayList();
-
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
-        //TODO: fix this. When multiple files are loaded, the last file row is repeated.
+        Button clear = new Button("clear");
+
         open.setOnAction((actionEvent)->{
             List<File> temp = chooser.showOpenMultipleDialog(primaryStage);
             if(Objects.nonNull(temp)) {
                 temp.stream().filter(Objects::nonNull)
-                            .forEach((file) -> vidFiles.add(wrapFile(file)));
+                            .forEach((file) -> {
+                                tableView.getItems().add(wrapFile(file));
+                            });
+
+                //This is important. Otherwise you see duplicated row displays.
+                tableView.refresh();
             }
-            tableView.setItems(vidFiles);
+        });
+
+        clear.setOnAction((actionEvent)->{
+            tableView.getItems().clear();
+            tableView.refresh();
         });
 
         open.setId("open-btn");
         open.setTooltip(buildToolTip(appProperties.getOpenBtnToolTip(),null));
 
-        leftSide.getChildren().add(open);
+        clear.setId("clear-btn");
+        clear.setTooltip(buildToolTip(appProperties.getClearBtnToolTip(), null));
+
+        HBox leftSideHbox = new HBox();
+        leftSideHbox.setSpacing(10);
+        leftSideHbox.getChildren().addAll(open,clear);
+
+        leftSide.getChildren().add(leftSideHbox);
         leftSide.setMaxWidth(leftPaneWidth);
         leftSide.setMinWidth(leftPaneWidth);
 
@@ -150,7 +164,7 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     private void configTableColumns(){
 
-        TableColumn<VideoFileWrapper,String> iconColumn = new TableColumn<>();
+        TableColumn<VideoFileWrapper,String> iconColumn = new TableColumn<>("Video Files");
         Callback<TableColumn<VideoFileWrapper, String>, TableCell<VideoFileWrapper, String>> cellFactory;
         cellFactory = new Callback<TableColumn<VideoFileWrapper, String>, TableCell<VideoFileWrapper, String>>(){
             @Override
