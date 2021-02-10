@@ -1,14 +1,12 @@
 package com.player.ui;
 
 import com.player.entity.VideoFileWrapper;
+import com.player.service.ConsumerService;
+import com.player.service.ProducerService;
 import com.player.utils.ApplicationProperties;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -19,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -39,6 +37,14 @@ public class MainScreen implements ParentScreen {
     @Autowired
     @Qualifier("appProperties")
     private ApplicationProperties appProperties;
+
+    @Autowired
+    @Qualifier("playerService")
+    private ConsumerService consumerService;
+
+    @Autowired
+    @Qualifier("producerService")
+    private ProducerService producerService;
 
     private final double leftPaneWidth = 220;
     private final double gridPaneHeight = 430;
@@ -90,10 +96,12 @@ public class MainScreen implements ParentScreen {
         VBox rightSide = new VBox(new Label("Now Playing ... "));
         HBox hBox = configureVidControls();
 
+        Slider slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
         GridPane gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
-        rightSide.getChildren().addAll(gridPane,hBox);
+
+        rightSide.getChildren().addAll(gridPane,slider,hBox);
 
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(leftSide,rightSide);
@@ -137,17 +145,35 @@ public class MainScreen implements ParentScreen {
         Button rewind = setImage(new Button(), "back", "ui-control");
         Button play = setImage(new Button(), "play","ui-control");
         play.setOnAction((actionEvent)->{
-            System.out.println("Now Playing ... ");
+            // TODO:
+            // 1. if none selected load all into queue
+            // 2. if any selected load only those
+            queue();
+
         });
 
         Button fastForward = setImage(new Button(), "forward","ui-control");
-
         HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),
                                                 appProperties.getHboxWidth(),
                                                 Pos.BASELINE_CENTER);
         hBox.getChildren().addAll(pause,rewind,play,fastForward,stop);
 
         return hBox;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private void queue(){
+        if(!tableView.getSelectionModel().getSelectedCells().isEmpty()) {
+            List<Integer> selectedCells = tableView.getSelectionModel().getSelectedCells()
+                    .stream()
+                    .map(TablePositionBase::getRow).collect(Collectors.toList());
+
+            selectedCells.forEach((index) -> {
+                producerService.add(tableView.getItems().get(index));
+            });
+        }else{
+            producerService.load(tableView.getItems());
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////

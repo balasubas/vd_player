@@ -1,6 +1,8 @@
 package com.player.ui;
 
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
@@ -27,6 +29,21 @@ public interface ParentScreen {
         Tooltip tooltip = new Tooltip(message);
         tooltip.setShowDuration(duration);
         return tooltip;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    default Slider builStandardSlider( String id, double min, double max, double value,
+                                       double height, double width ){
+        Slider slider = new Slider(min, max, value);
+        slider.setId(id);
+        slider.setOrientation(Orientation.HORIZONTAL);
+        slider.setMinHeight(height);
+        slider.setMaxWidth(width);
+        slider.setBlockIncrement(1000);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+
+        return slider;
     }
 
 }

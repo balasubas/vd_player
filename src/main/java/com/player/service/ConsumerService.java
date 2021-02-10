@@ -1,4 +1,12 @@
 package com.player.service;
 
+import com.player.entity.VideoFileWrapper;
+
 public interface ConsumerService {
+
+    //////////////////////////////////////////////////////////////////////////
+    void consume(VideoFileWrapper file);
+
+    //////////////////////////////////////////////////////////////////////////
+    void playFromQueue(ProducerService producerService);
 }
