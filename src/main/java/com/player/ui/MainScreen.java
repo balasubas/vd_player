@@ -52,6 +52,7 @@ public class MainScreen implements ParentScreen {
     private final double spacing = 10;
     private  FileChooser chooser;
     private TableView<VideoFileWrapper> tableView;
+    private GridPane gridPane;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
@@ -97,7 +98,7 @@ public class MainScreen implements ParentScreen {
         HBox hBox = configureVidControls();
 
         Slider slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
-        GridPane gridPane = new GridPane();
+        gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
 
@@ -148,7 +149,12 @@ public class MainScreen implements ParentScreen {
             // TODO:
             // 1. if none selected load all into queue
             // 2. if any selected load only those
-            queue();
+            // 3. When playing a file: MEDIA_UNSUPPORTED : media type not supported
+            System.out.println("Playing... ");
+            if(!tableView.getItems().isEmpty()){
+                queue();
+                consumerService.playFromQueue(producerService, gridPane);
+            }
 
         });
 
