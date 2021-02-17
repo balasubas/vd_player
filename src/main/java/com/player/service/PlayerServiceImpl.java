@@ -2,8 +2,10 @@ package com.player.service;
 
 import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
+import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
 import java.io.IOException;
@@ -13,6 +15,7 @@ public class PlayerServiceImpl implements ConsumerService {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
+    private Player currentPlayer;
 
     //////////////////////////////////////////////////////////////////////////
     public PlayerServiceImpl(){
@@ -22,12 +25,18 @@ public class PlayerServiceImpl implements ConsumerService {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void consume(VideoFileWrapper file, Pane pane) {
+
+        //TODO:
+        //     1. Determine if there is something current
         try {
-            Player player = new Player(file);
-            if(player.getMediaPlayer() != null){
-                MediaView mediaView = new MediaView(player.getMediaPlayer());
+            currentPlayer = new Player(file);
+            if(currentPlayer.getMediaPlayer() != null){
+                MediaView mediaView = new MediaView(currentPlayer.getMediaPlayer());
+                mediaView.setFitWidth(450);
+                mediaView.setFitHeight(350);
+                ((GridPane) pane).setAlignment(Pos.CENTER);
                 ((GridPane) pane).add(mediaView,1,1);
-                player.getMediaPlayer().play();
+                currentPlayer.getMediaPlayer().play();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,6 +48,46 @@ public class PlayerServiceImpl implements ConsumerService {
     public void playFromQueue(ProducerService producerService, Pane pane) {
         while(!producerService.isEmpty()){
             consume(producerService.get(),pane);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void stop() {
+        if(currentPlayer != null){
+            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)){
+                currentPlayer.getMediaPlayer().stop();
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void pause() {
+        if(currentPlayer != null){
+            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)){
+                currentPlayer.getMediaPlayer().pause();
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void play(VideoFileWrapper file, Pane pane) {
+        //TODO:
+        // 1. Determine if something is playing - if so stop it
+        // 2. Clear queue
+        // 3. Then play
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void resume() {
+        if(currentPlayer != null){
+            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.STOPPED) ||
+                    currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
+                currentPlayer.getMediaPlayer().play();
+            }
         }
     }
 

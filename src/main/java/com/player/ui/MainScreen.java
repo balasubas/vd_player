@@ -24,8 +24,9 @@ import java.util.stream.Collectors;
 
 /**
  * TODO:
- *   1. For the ui control buttons, you have to add back the css style for hover
- *   and pressed. These disappear when adding background colors.
+ *   1. Make sure you can center the video into the gridpane
+ *   2. Make sure it can be resized
+ *
  *
  *
  * **/
@@ -142,26 +143,28 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     private HBox configureVidControls(){
         Button pause = setImage(new Button(), "pause","ui-control");
+        pause.setOnAction((action)->{
+            consumerService.pause();
+        });
+
         Button stop = setImage(new Button(), "stop","ui-control");
+        stop.setOnAction((action)->{
+            consumerService.stop();
+        });
+
         Button rewind = setImage(new Button(), "back", "ui-control");
         Button play = setImage(new Button(), "play","ui-control");
         play.setOnAction((actionEvent)->{
-            // TODO:
-            // 1. if none selected load all into queue
-            // 2. if any selected load only those
-            // 3. When playing a file: MEDIA_UNSUPPORTED : media type not supported
-            System.out.println("Playing... ");
             if(!tableView.getItems().isEmpty()){
                 queue();
                 consumerService.playFromQueue(producerService, gridPane);
             }
-
         });
 
         Button fastForward = setImage(new Button(), "forward","ui-control");
         HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),
-                                                appProperties.getHboxWidth(),
-                                                Pos.BASELINE_CENTER);
+                                               appProperties.getHboxWidth(),
+                                               Pos.BASELINE_CENTER);
         hBox.getChildren().addAll(pause,rewind,play,fastForward,stop);
 
         return hBox;
