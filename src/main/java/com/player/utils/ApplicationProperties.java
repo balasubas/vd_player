@@ -13,6 +13,9 @@ public class ApplicationProperties {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
+    @Value( "${forward.rate.increment}" )
+    private double stdRateIncrease;
+
     @Value( "${standard.height}" )
     private int stdHeight;
 
@@ -129,6 +132,11 @@ public class ApplicationProperties {
     //////////////////////////////////////////////////////////////////////////
     public String getClearBtnToolTip(){
         return clearBtnToolTip;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public double getStdRateIncrease(){
+        return stdRateIncrease;
     }
 
 }

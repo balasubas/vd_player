@@ -46,4 +46,10 @@ public class ProducerServiceImpl implements ProducerService {
         return playQueue.isEmpty();
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void clear() {
+        playQueue.clear();
+    }
+
 }

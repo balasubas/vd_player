@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -79,6 +80,13 @@ public class MainScreen implements ParentScreen {
         clear.setOnAction((actionEvent)->{
             tableView.getItems().clear();
             tableView.refresh();
+            if(!gridPane.getChildren().isEmpty()){
+                if(consumerService.isPlaying()){
+                    consumerService.stop();
+                }
+                gridPane.getChildren().removeIf((node)-> node.getClass().equals(MediaView.class));
+            }
+
         });
 
         open.setId("open-btn");
@@ -156,12 +164,25 @@ public class MainScreen implements ParentScreen {
         Button play = setImage(new Button(), "play","ui-control");
         play.setOnAction((actionEvent)->{
             if(!tableView.getItems().isEmpty()){
-                queue();
-                consumerService.playFromQueue(producerService, gridPane);
+                if(consumerService.isPlaying()){
+                    VideoFileWrapper videoFileWrapper = tableView.getSelectionModel().getSelectedItem();
+                    if(videoFileWrapper != null){
+                        consumerService.play(videoFileWrapper,gridPane,producerService);
+                    }
+                }else{
+                    queue();
+                    consumerService.playFromQueue(producerService, gridPane);
+                }
             }
         });
 
         Button fastForward = setImage(new Button(), "forward","ui-control");
+        fastForward.setOnAction((event)->{
+            if(consumerService.isPlaying()){
+                consumerService.forward(appProperties.getStdRateIncrease());
+            }
+        });
+
         HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),
                                                appProperties.getHboxWidth(),
                                                Pos.BASELINE_CENTER);

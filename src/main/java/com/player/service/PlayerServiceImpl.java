@@ -73,11 +73,14 @@ public class PlayerServiceImpl implements ConsumerService {
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public void play(VideoFileWrapper file, Pane pane) {
-        //TODO:
-        // 1. Determine if something is playing - if so stop it
-        // 2. Clear queue
-        // 3. Then play
+    public void play(VideoFileWrapper file, Pane pane, ProducerService producerService) {
+        if(currentPlayer != null){
+            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)){
+                currentPlayer.getMediaPlayer().stop();
+                producerService.clear();
+                consume(file,pane);
+            }
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -89,6 +92,21 @@ public class PlayerServiceImpl implements ConsumerService {
                 currentPlayer.getMediaPlayer().play();
             }
         }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void forward(double rate) {
+        if(currentPlayer.getMediaPlayer().getRate() < 1.90) {
+            currentPlayer.setPlayerRate(rate);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean isPlaying() {
+        return currentPlayer != null &&
+                currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING);
     }
 
 }

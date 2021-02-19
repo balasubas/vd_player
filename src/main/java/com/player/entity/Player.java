@@ -23,6 +23,7 @@ public class Player {
         }else{
             throw new IOException("Media file is not valid.");
         }
+
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,12 @@ public class Player {
     //////////////////////////////////////////////////////////////////////////
     public  MediaPlayer getMediaPlayer(){
         return mediaPlayer;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public void setPlayerRate(double rate){
+        double currentRate = mediaPlayer.getRate() + rate;
+        mediaPlayer.setRate(currentRate);
     }
 
     //////////////////////////////////////////////////////////////////////////
