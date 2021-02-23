@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -24,6 +25,9 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     private Player currentPlayer;
     private ChangeListener<? super Player> listener;
     private PropertyChangeSupport pcs;
+    private Pane pane;
+    private ProducerService producerService;
+    private boolean isPlayingFromQueue = false;
 
     //////////////////////////////////////////////////////////////////////////
     public PlayerServiceImpl(){
@@ -64,21 +68,23 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void playFromQueue(ProducerService producerService, Pane pane) {
-        //TODO: Using a loop here is not the way to go
-        // once the status changes to READY or PLAYING
-        // this loop breaks and the play from queue is stopped
-        // Maybe a better way to do this to to set a Listener on the Player
-        // 1. If there is no player then just play.
-        // 2. If the player is DONE, then grab the next queue entry.
-        //
+        // This only fires off the first
+        // video in the queue. The rest of the videos are fired off
+        // via the property change listener.
+        // see the propertyChange method.
 
-        while(!isPlaying()){
-            //if(!isPlaying()) {
-            if(producerService.isEmpty()){ break;}
-                VideoFileWrapper videoFileWrapper = producerService.get();
-                System.out.println("Now playing: " + videoFileWrapper.getVideoFile().getName() + " <<<<< ");
-                consume(videoFileWrapper, pane);
-            //}
+        if(!Objects.nonNull(this.pane)){
+            this.pane = pane;
+        }
+
+        if(!Objects.nonNull(this.producerService)){
+            this.producerService = producerService;
+        }
+
+        if(!producerService.isEmpty()) {
+            isPlayingFromQueue = true;
+            VideoFileWrapper videoFileWrapper = producerService.get();
+            consume(videoFileWrapper, this.pane);
         }
     }
 
@@ -110,16 +116,22 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
                 currentPlayer.getMediaPlayer().stop();
                 producerService.clear();
                 consume(file,pane);
+            }else if(currentPlayer.isPaused()){
+                resume();
             }
+        }else{
+            producerService.clear();
+            consume(file,pane);
         }
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void resume() {
+        //TODO: This needs fixed, it keeps playing from the start
         if(currentPlayer != null){
-            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.STOPPED) ||
-                    currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
+            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
+                currentPlayer.getMediaPlayer().setStartTime(currentPlayer.getMediaPlayer().getCurrentTime());
                 currentPlayer.getMediaPlayer().play();
             }
         }
@@ -149,8 +161,16 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("Name      = " + evt.getPropertyName());
-        System.out.println("Old Value = " + evt.getOldValue());
-        System.out.println("New Value = " + evt.getNewValue());
+        final String stopped = "STOPPED";
+        final String paused = "PAUSED";
+
+        if(evt.getNewValue().equals(stopped)){
+            if(!this.producerService .isEmpty() && isPlayingFromQueue) {
+                VideoFileWrapper videoFileWrapper = this.producerService .get();
+                consume(videoFileWrapper, this.pane);
+            }else{
+                isPlayingFromQueue = false;
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.player.entity.VideoFileWrapper;
 import com.player.service.ConsumerService;
 import com.player.service.ProducerService;
 import com.player.utils.ApplicationProperties;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -163,17 +164,22 @@ public class MainScreen implements ParentScreen {
         Button rewind = setImage(new Button(), "back", "ui-control");
         Button play = setImage(new Button(), "play","ui-control");
         play.setOnAction((actionEvent)->{
-            if(!tableView.getItems().isEmpty()){
-                if(consumerService.isPlaying()){
-                    VideoFileWrapper videoFileWrapper = tableView.getSelectionModel().getSelectedItem();
-                    if(videoFileWrapper != null){
-                        consumerService.play(videoFileWrapper,gridPane,producerService);
+
+            if(!tableView.getItems().isEmpty()) {
+                ObservableList<VideoFileWrapper> selectedItems =
+                        tableView.getSelectionModel().getSelectedItems();
+
+               if (Objects.nonNull(selectedItems) && selectedItems.size() == 1) {
+                    VideoFileWrapper videoFileWrapper = selectedItems.get(0);
+                    if (videoFileWrapper != null) {
+                        consumerService.play(videoFileWrapper, gridPane, producerService);
                     }
-                }else{
+                } else {
                     queue();
                     consumerService.playFromQueue(producerService, gridPane);
                 }
             }
+
         });
 
         Button fastForward = setImage(new Button(), "forward","ui-control");

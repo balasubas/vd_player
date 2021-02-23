@@ -25,10 +25,14 @@ public class Player {
         if(fileIsValid(videoFileWrapper)){
             media = new Media(videoFileWrapper.getVideoFile().toURI().toURL().toExternalForm());
             mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setOnEndOfMedia(()->{
+                mediaPlayer.stop();
+            });
+
             mediaPlayer.statusProperty().addListener((status,oldVal, newVal)->{
                 currentStatus = newVal;
                 if(Objects.nonNull(oldVal) && Objects.nonNull(newVal)) {
-                    ((PlayerServiceImpl) consumerService).fire(oldVal.toString(), newVal.toString());
+                    consumerService.fire(oldVal.toString(), newVal.toString());
                 }
             });
 
@@ -51,6 +55,11 @@ public class Player {
     public boolean isPlaying(){
         return currentStatus.equals(MediaPlayer.Status.READY) ||
                 currentStatus.equals(MediaPlayer.Status.PLAYING);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public boolean isPaused(){
+        return currentStatus.equals(MediaPlayer.Status.PAUSED);
     }
 
     //////////////////////////////////////////////////////////////////////////
