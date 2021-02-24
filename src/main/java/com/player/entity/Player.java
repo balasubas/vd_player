@@ -1,9 +1,9 @@
 package com.player.entity;
 
 import com.player.service.ConsumerService;
-import com.player.service.PlayerServiceImpl;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -17,6 +17,7 @@ public class Player {
     private VideoFileWrapper videoFileWrapper;
     private MediaPlayer.Status currentStatus = MediaPlayer.Status.UNKNOWN;
     private ConsumerService consumerService;
+    private Duration pauseTime = Duration.seconds(0.0);
 
     //////////////////////////////////////////////////////////////////////////
     public Player( VideoFileWrapper videoFileWrapper ) throws IOException {
@@ -34,6 +35,10 @@ public class Player {
                 if(Objects.nonNull(oldVal) && Objects.nonNull(newVal)) {
                     consumerService.fire(oldVal.toString(), newVal.toString());
                 }
+            });
+
+            mediaPlayer.setOnPaused(()->{
+                pauseTime = mediaPlayer.getCurrentTime();
             });
 
         }else{
@@ -76,6 +81,11 @@ public class Player {
     public void setPlayerRate(double rate){
         double currentRate = mediaPlayer.getRate() + rate;
         mediaPlayer.setRate(currentRate);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public Duration getPauseTime(){
+        return pauseTime;
     }
 
     //////////////////////////////////////////////////////////////////////////

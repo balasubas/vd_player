@@ -9,6 +9,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.util.Duration;
+
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -28,6 +30,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     private Pane pane;
     private ProducerService producerService;
     private boolean isPlayingFromQueue = false;
+    private final Duration REWIND_CONST = Duration.millis(500);
 
     //////////////////////////////////////////////////////////////////////////
     public PlayerServiceImpl(){
@@ -92,7 +95,8 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void stop() {
         if(currentPlayer != null){
-            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)){
+            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING) ||
+                    currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
                 currentPlayer.getMediaPlayer().stop();
             }
         }
@@ -112,13 +116,15 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void play(VideoFileWrapper file, Pane pane, ProducerService producerService) {
         if(currentPlayer != null){
-            if(currentPlayer.isPlaying()){
+
+            if(currentPlayer.isPaused()){
+                resume();
+            }else{
                 currentPlayer.getMediaPlayer().stop();
                 producerService.clear();
                 consume(file,pane);
-            }else if(currentPlayer.isPaused()){
-                resume();
             }
+
         }else{
             producerService.clear();
             consume(file,pane);
@@ -128,11 +134,27 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void resume() {
-        //TODO: This needs fixed, it keeps playing from the start
         if(currentPlayer != null){
             if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
-                currentPlayer.getMediaPlayer().setStartTime(currentPlayer.getMediaPlayer().getCurrentTime());
+                currentPlayer.getMediaPlayer().seek(currentPlayer.getPauseTime());
                 currentPlayer.getMediaPlayer().play();
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void rewind() {
+        //TODO: This does not seem to work
+        if(currentPlayer != null){
+            Duration backDuration;
+            if(currentPlayer.isPlaying()){
+                currentPlayer.getMediaPlayer().pause();
+                backDuration = new Duration(currentPlayer.getPauseTime().toMillis() - REWIND_CONST.toMillis());
+                currentPlayer.getMediaPlayer().seek(backDuration);
+            }else if(currentPlayer.isPaused()){
+                backDuration = new Duration(currentPlayer.getPauseTime().toMillis() - REWIND_CONST.toMillis());
+                currentPlayer.getMediaPlayer().seek(backDuration);
             }
         }
     }
@@ -149,7 +171,13 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public boolean isPlaying() {
         return currentPlayer != null &&
-                !currentPlayer.isPlaying();
+                currentPlayer.isPlaying();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean isPaused() {
+        return currentPlayer != null && currentPlayer.isPaused();
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -162,7 +190,6 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final String stopped = "STOPPED";
-        final String paused = "PAUSED";
 
         if(evt.getNewValue().equals(stopped)){
             if(!this.producerService .isEmpty() && isPlayingFromQueue) {

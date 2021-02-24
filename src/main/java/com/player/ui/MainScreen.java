@@ -135,12 +135,6 @@ public class MainScreen implements ParentScreen {
         selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
         tableView.setSelectionModel(selectionModel);
 
-
-//        tableView.setOnMouseClicked((evt)->{
-//            String select = tableView.getSelectionModel().getSelectedItem().getAbsolutePath();
-//            System.out.println(select + " <<<<< ");
-//        });
-
         configTableColumns();
 
         vBox.getChildren().add(tableView);
@@ -162,6 +156,11 @@ public class MainScreen implements ParentScreen {
         });
 
         Button rewind = setImage(new Button(), "back", "ui-control");
+        rewind.setOnAction((actionEvent)->{
+            consumerService.rewind();
+        });
+
+
         Button play = setImage(new Button(), "play","ui-control");
         play.setOnAction((actionEvent)->{
 
@@ -169,7 +168,9 @@ public class MainScreen implements ParentScreen {
                 ObservableList<VideoFileWrapper> selectedItems =
                         tableView.getSelectionModel().getSelectedItems();
 
-               if (Objects.nonNull(selectedItems) && selectedItems.size() == 1) {
+               if(consumerService.isPaused()){
+                   consumerService.resume();
+               } else if (Objects.nonNull(selectedItems) && selectedItems.size() == 1) {
                     VideoFileWrapper videoFileWrapper = selectedItems.get(0);
                     if (videoFileWrapper != null) {
                         consumerService.play(videoFileWrapper, gridPane, producerService);
