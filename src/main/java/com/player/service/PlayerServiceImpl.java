@@ -11,7 +11,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -30,7 +29,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     private Pane pane;
     private ProducerService producerService;
     private boolean isPlayingFromQueue = false;
-    private final Duration REWIND_CONST = Duration.millis(500);
+    private final Duration REWIND_CONST = new Duration(1000);
 
     //////////////////////////////////////////////////////////////////////////
     public PlayerServiceImpl(){
@@ -146,16 +145,21 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void rewind() {
         //TODO: This does not seem to work
+        // Use this as a reference. https://docs.oracle.com/javafx/2/api/javafx/scene/media/MediaPlayer.html#seek(javafx.util.Duration)
+        // You have to pay attention to start and stop time vs seek time
         if(currentPlayer != null){
+
             Duration backDuration;
-            if(currentPlayer.isPlaying()){
-                currentPlayer.getMediaPlayer().pause();
-                backDuration = new Duration(currentPlayer.getPauseTime().toMillis() - REWIND_CONST.toMillis());
-                currentPlayer.getMediaPlayer().seek(backDuration);
-            }else if(currentPlayer.isPaused()){
-                backDuration = new Duration(currentPlayer.getPauseTime().toMillis() - REWIND_CONST.toMillis());
-                currentPlayer.getMediaPlayer().seek(backDuration);
-            }
+            backDuration = currentPlayer.getPauseTime().subtract(REWIND_CONST);
+            currentPlayer.getMediaPlayer().seek(backDuration);
+//            if(currentPlayer.isPlaying()){
+//                currentPlayer.getMediaPlayer().pause();
+//                backDuration = currentPlayer.getPauseTime().subtract(REWIND_CONST);
+//                currentPlayer.getMediaPlayer().seek(backDuration);
+//            }else if(currentPlayer.isPaused()){
+//                backDuration = currentPlayer.getPauseTime().subtract(REWIND_CONST);
+//                currentPlayer.getMediaPlayer().seek(backDuration);
+//            }
         }
     }
 

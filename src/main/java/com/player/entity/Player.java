@@ -17,7 +17,6 @@ public class Player {
     private VideoFileWrapper videoFileWrapper;
     private MediaPlayer.Status currentStatus = MediaPlayer.Status.UNKNOWN;
     private ConsumerService consumerService;
-    private Duration pauseTime = Duration.seconds(0.0);
 
     //////////////////////////////////////////////////////////////////////////
     public Player( VideoFileWrapper videoFileWrapper ) throws IOException {
@@ -36,17 +35,14 @@ public class Player {
                     consumerService.fire(oldVal.toString(), newVal.toString());
                 }
             });
-
-            mediaPlayer.setOnPaused(()->{
-                pauseTime = mediaPlayer.getCurrentTime();
-            });
-
+            
         }else{
             throw new IOException("Media file is not valid.");
         }
 
     }
 
+    //////////////////////////////////////////////////////////////////////////
     public void register( ConsumerService consumerService){
         this.consumerService = consumerService;
     }
@@ -85,7 +81,7 @@ public class Player {
 
     //////////////////////////////////////////////////////////////////////////
     public Duration getPauseTime(){
-        return pauseTime;
+        return mediaPlayer.getCurrentTime();
     }
 
     //////////////////////////////////////////////////////////////////////////
