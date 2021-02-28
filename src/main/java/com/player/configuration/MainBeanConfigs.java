@@ -1,9 +1,6 @@
 package com.player.configuration;
 
-import com.player.service.ConsumerService;
-import com.player.service.PlayerServiceImpl;
-import com.player.service.ProducerService;
-import com.player.service.ProducerServiceImpl;
+import com.player.service.*;
 import com.player.ui.MainScreen;
 import com.player.utils.ApplicationProperties;
 import org.springframework.context.annotation.Bean;
@@ -28,5 +25,9 @@ public class MainBeanConfigs {
     //////////////////////////////////////////////////////////////////////////
     @Bean("producerService")
     public ProducerService getProducerService(){ return new ProducerServiceImpl(); }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Bean("frameService")
+    public FrameService getFrameService(){ return new FrameServiceImpl(); }
 
 }

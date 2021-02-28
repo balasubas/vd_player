@@ -10,6 +10,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -23,13 +25,17 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
+    @Autowired
+    @Qualifier("frameService")
+    private  FrameService frameService;
+
     private Player currentPlayer;
     private ChangeListener<? super Player> listener;
     private PropertyChangeSupport pcs;
     private Pane pane;
     private ProducerService producerService;
     private boolean isPlayingFromQueue = false;
-    private final Duration REWIND_CONST = new Duration(1000);
+    private final Duration REWIND_CONST = new Duration(100);
 
     //////////////////////////////////////////////////////////////////////////
     public PlayerServiceImpl(){
@@ -55,6 +61,10 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             //can update the events
             currentPlayer.register(this);
             if(currentPlayer.getMediaPlayer() != null){
+                currentPlayer.getMediaPlayer().currentTimeProperty().addListener((durs)->{
+                    System.out.println(currentPlayer.getMediaPlayer().getCurrentTime() + " <<<<< ");
+                });
+
                 MediaView mediaView = new MediaView(currentPlayer.getMediaPlayer());
                 mediaView.setFitWidth(450);
                 mediaView.setFitHeight(350);
@@ -144,22 +154,24 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void rewind() {
-        //TODO: This does not seem to work
-        // Use this as a reference. https://docs.oracle.com/javafx/2/api/javafx/scene/media/MediaPlayer.html#seek(javafx.util.Duration)
-        // You have to pay attention to start and stop time vs seek time
-        if(currentPlayer != null){
 
-            Duration backDuration;
-            backDuration = currentPlayer.getPauseTime().subtract(REWIND_CONST);
-            currentPlayer.getMediaPlayer().seek(backDuration);
-//            if(currentPlayer.isPlaying()){
-//                currentPlayer.getMediaPlayer().pause();
-//                backDuration = currentPlayer.getPauseTime().subtract(REWIND_CONST);
-//                currentPlayer.getMediaPlayer().seek(backDuration);
-//            }else if(currentPlayer.isPaused()){
-//                backDuration = currentPlayer.getPauseTime().subtract(REWIND_CONST);
-//                currentPlayer.getMediaPlayer().seek(backDuration);
-//            }
+        if(currentPlayer != null){
+            currentPlayer.getMediaPlayer().pause();
+            Thread th = (new Thread(()->{
+                // TODO: you will need a new class to store the frames.
+                // remove this dummy value once done
+                currentPlayer.getMediaPlayer().setStartTime(Duration.millis(2360.930978));
+                currentPlayer.getMediaPlayer().seek(currentPlayer.getMediaPlayer().getStartTime());
+            }));
+
+            th.start();
+            try {
+                th.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            currentPlayer.getMediaPlayer().play();
         }
     }
 

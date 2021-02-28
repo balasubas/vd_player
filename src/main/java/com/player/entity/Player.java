@@ -35,6 +35,10 @@ public class Player {
                     consumerService.fire(oldVal.toString(), newVal.toString());
                 }
             });
+
+            mediaPlayer.setOnStopped(()->{
+                mediaPlayer.setStartTime(Duration.ZERO);
+            });
             
         }else{
             throw new IOException("Media file is not valid.");
