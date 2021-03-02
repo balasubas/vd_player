@@ -61,8 +61,11 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             //can update the events
             currentPlayer.register(this);
             if(currentPlayer.getMediaPlayer() != null){
+
                 currentPlayer.getMediaPlayer().currentTimeProperty().addListener((durs)->{
-                    System.out.println(currentPlayer.getMediaPlayer().getCurrentTime() + " <<<<< ");
+                    if(!currentPlayer.isPaused()) {
+                        frameService.addPlaybackPoint(currentPlayer.getMediaPlayer().getCurrentTime().toMillis());
+                    }
                 });
 
                 MediaView mediaView = new MediaView(currentPlayer.getMediaPlayer());
@@ -107,6 +110,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING) ||
                     currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
                 currentPlayer.getMediaPlayer().stop();
+                frameService.clearPlaybackPoints();
             }
         }
     }
@@ -158,9 +162,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
         if(currentPlayer != null){
             currentPlayer.getMediaPlayer().pause();
             Thread th = (new Thread(()->{
-                // TODO: you will need a new class to store the frames.
-                // remove this dummy value once done
-                currentPlayer.getMediaPlayer().setStartTime(Duration.millis(2360.930978));
+                currentPlayer.getMediaPlayer().setStartTime(Duration.millis(frameService.back(20)));
                 currentPlayer.getMediaPlayer().seek(currentPlayer.getMediaPlayer().getStartTime());
             }));
 
