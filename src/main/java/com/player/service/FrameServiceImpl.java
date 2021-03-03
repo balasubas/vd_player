@@ -1,5 +1,7 @@
 package com.player.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Stack;
 
 public class FrameServiceImpl implements FrameService {
@@ -17,8 +19,8 @@ public class FrameServiceImpl implements FrameService {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void addPlaybackPoint(double playbackPoint) {
-        System.out.println(playbackPoint + " <<<<< ");
-        frameStack.push(playbackPoint);
+        Double precise = BigDecimal.valueOf(playbackPoint).setScale(2, RoundingMode.DOWN).doubleValue();
+        frameStack.push(precise);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -31,8 +33,6 @@ public class FrameServiceImpl implements FrameService {
             frameNum = frameStack.pop();
             numberOfPoints -= 1;
         }
-
-        System.out.println(frameNum + " ***** ");
 
         return frameNum;
     }

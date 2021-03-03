@@ -158,11 +158,14 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void rewind() {
-
+        // This is not as precise. From research, it appears this is the best it gets using the standard
+        // JavaFX library
         if(currentPlayer != null){
-            currentPlayer.getMediaPlayer().pause();
-            Thread th = (new Thread(()->{
-                currentPlayer.getMediaPlayer().setStartTime(Duration.millis(frameService.back(20)));
+            if(currentPlayer.isPlaying()) {
+                currentPlayer.getMediaPlayer().pause();
+            }
+            Thread th = (new Thread(() -> {
+                currentPlayer.getMediaPlayer().setStartTime(Duration.seconds(frameService.back(2)/1000));
                 currentPlayer.getMediaPlayer().seek(currentPlayer.getMediaPlayer().getStartTime());
             }));
 
@@ -172,8 +175,6 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            currentPlayer.getMediaPlayer().play();
         }
     }
 
