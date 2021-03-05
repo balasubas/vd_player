@@ -29,11 +29,14 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Qualifier("frameService")
     private  FrameService frameService;
 
+    @Autowired
+    @Qualifier("queueService")
+    private QueueService queueService;
+
     private Player currentPlayer;
     private ChangeListener<? super Player> listener;
     private PropertyChangeSupport pcs;
     private Pane pane;
-    private ProducerService producerService;
     private boolean isPlayingFromQueue = false;
     private final Duration REWIND_CONST = new Duration(100);
 
@@ -82,23 +85,17 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public void playFromQueue(ProducerService producerService, Pane pane) {
-        // This only fires off the first
-        // video in the queue. The rest of the videos are fired off
-        // via the property change listener.
-        // see the propertyChange method.
+    public void playFromQueue(Pane pane) {
+        // This only fires off the first video in the queue. The rest of the videos are fired off
+        // via the property change listener. See the propertyChange method.
 
         if(!Objects.nonNull(this.pane)){
             this.pane = pane;
         }
 
-        if(!Objects.nonNull(this.producerService)){
-            this.producerService = producerService;
-        }
-
-        if(!producerService.isEmpty()) {
+        if(!queueService.isEmpty()) {
             isPlayingFromQueue = true;
-            VideoFileWrapper videoFileWrapper = producerService.get();
+            VideoFileWrapper videoFileWrapper = queueService.pop();
             consume(videoFileWrapper, this.pane);
         }
     }
@@ -211,8 +208,8 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
         final String stopped = "STOPPED";
 
         if(evt.getNewValue().equals(stopped)){
-            if(!this.producerService .isEmpty() && isPlayingFromQueue) {
-                VideoFileWrapper videoFileWrapper = this.producerService .get();
+            if(!queueService.isEmpty() && isPlayingFromQueue) {
+                VideoFileWrapper videoFileWrapper = queueService.pop();
                 consume(videoFileWrapper, this.pane);
             }else{
                 isPlayingFromQueue = false;

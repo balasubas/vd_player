@@ -1,53 +1,56 @@
 package com.player.service;
 
 import com.player.entity.VideoFileWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ProducerServiceImpl implements ProducerService {
+public class QueueServiceImpl implements QueueService {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
-    @Autowired
-    @Qualifier("queueService")
-    private QueueService queueService;
+    private Queue<VideoFileWrapper> mainQueue;
 
     //////////////////////////////////////////////////////////////////////////
-    @Override
-    public void add(VideoFileWrapper videoFileWrapper) {
-        queueService.push(videoFileWrapper);
+    public QueueServiceImpl(){
+        mainQueue = new ConcurrentLinkedQueue<>();
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public VideoFileWrapper get() {
-        return queueService.isEmpty() ? null: queueService.pop();
+    public int getSize() {
+        return mainQueue.size();
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public VideoFileWrapper get(int index) {
-        return null;
+    public void push(VideoFileWrapper videoFileWrapper) {
+        mainQueue.add(videoFileWrapper);
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public void load(List<VideoFileWrapper> videoFileWrapperList) {
-        queueService.addAll(videoFileWrapperList);
+    public VideoFileWrapper pop() {
+        return mainQueue.remove();
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
     public boolean isEmpty() {
-        return queueService.isEmpty();
+        return mainQueue.isEmpty();
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void clear() {
-        queueService.clear();
+        mainQueue.clear();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void addAll(List<VideoFileWrapper> videoFileWrapperList) {
+        mainQueue.addAll(videoFileWrapperList);
     }
 
 }
