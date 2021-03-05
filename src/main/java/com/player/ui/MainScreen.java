@@ -24,15 +24,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
-/**
- * TODO:
- *   1. Make sure you can center the video into the gridpane
- *   2. Make sure it can be resized
- *
- *
- *
- * **/
-
 public class MainScreen implements ParentScreen {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
@@ -87,7 +78,6 @@ public class MainScreen implements ParentScreen {
                 }
                 gridPane.getChildren().removeIf((node)-> node.getClass().equals(MediaView.class));
             }
-
         });
 
         open.setId("open-btn");
@@ -110,7 +100,6 @@ public class MainScreen implements ParentScreen {
         Slider slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
-
 
         rightSide.getChildren().addAll(gridPane,slider,hBox);
 
@@ -177,7 +166,7 @@ public class MainScreen implements ParentScreen {
                     }
                 } else {
                     queue();
-                    consumerService.playFromQueue(producerService, gridPane);
+                    consumerService.playFromQueue(gridPane);
                 }
             }
 
@@ -193,6 +182,7 @@ public class MainScreen implements ParentScreen {
         HBox hBox = buildHbox("hbox-main", appProperties.getHboxHeight(),
                                                appProperties.getHboxWidth(),
                                                Pos.BASELINE_CENTER);
+
         hBox.getChildren().addAll(pause,rewind,play,fastForward,stop);
 
         return hBox;

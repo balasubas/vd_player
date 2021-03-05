@@ -30,4 +30,8 @@ public class MainBeanConfigs {
     @Bean("frameService")
     public FrameService getFrameService(){ return new FrameServiceImpl(); }
 
+    //////////////////////////////////////////////////////////////////////////
+    @Bean("queueService")
+    public QueueService getQueueService(){ return new QueueServiceImpl(); }
+
 }

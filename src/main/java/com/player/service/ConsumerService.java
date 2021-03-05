@@ -9,7 +9,7 @@ public interface ConsumerService {
     void consume(VideoFileWrapper file, Pane pane);
 
     //////////////////////////////////////////////////////////////////////////
-    void playFromQueue(ProducerService producerService, Pane pane);
+    void playFromQueue(Pane pane);
 
     //////////////////////////////////////////////////////////////////////////
     void stop();
