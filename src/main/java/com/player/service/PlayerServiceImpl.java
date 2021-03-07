@@ -59,24 +59,9 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
         found.ifPresent(node -> pane.getChildren().remove(node));
 
         try {
-            currentPlayer = new Player(file);
-            //Register this service to the player so it
-            //can update the events
-            currentPlayer.register(this);
+            currentPlayer = new Player(file,this, frameService);
             if(currentPlayer.getMediaPlayer() != null){
-
-                currentPlayer.getMediaPlayer().currentTimeProperty().addListener((durs)->{
-                    if(!currentPlayer.isPaused()) {
-                        frameService.addPlaybackPoint(currentPlayer.getMediaPlayer().getCurrentTime().toMillis());
-                    }
-                });
-
-                MediaView mediaView = new MediaView(currentPlayer.getMediaPlayer());
-                mediaView.setFitWidth(450);
-                mediaView.setFitHeight(350);
-                gridPane.setAlignment(Pos.CENTER);
-                gridPane.add(mediaView,1,1);
-                currentPlayer.getMediaPlayer().play();
+                currentPlayer.play(gridPane);
             }
         } catch (IOException e) {
             e.printStackTrace();
