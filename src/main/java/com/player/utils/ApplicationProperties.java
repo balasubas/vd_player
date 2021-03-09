@@ -105,6 +105,9 @@ public class ApplicationProperties {
             case "back": sb.append("back.png");
                          break;
 
+            case "pending": sb.append("pending.png");
+                         break;
+
             default: sb.append("play.png");
                      break;
         }

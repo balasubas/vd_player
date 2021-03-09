@@ -1,6 +1,8 @@
 package com.player.entity;
 
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -15,11 +17,13 @@ public class VideoProxyImpl implements VideoProxy {
     private GridPane pane;
     private MediaPlayer mediaPlayer;
     private PropertyChangeSupport pcs;
+    private String imageLogo;
 
     //////////////////////////////////////////////////////////////////////////
-    public VideoProxyImpl(GridPane pane, MediaPlayer mediaPlayer){
+    public VideoProxyImpl(GridPane pane, MediaPlayer mediaPlayer, String imageLogo){
         this.pane = pane;
         this.mediaPlayer = mediaPlayer;
+        this.imageLogo = imageLogo;
         pcs = new PropertyChangeSupport(this);
         pcs.addPropertyChangeListener(this);
     }
@@ -27,7 +31,10 @@ public class VideoProxyImpl implements VideoProxy {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void displayTemp() {
-
+        Image img = new Image(imageLogo);
+        ImageView imageView = new ImageView(img);
+        pane.setAlignment(Pos.CENTER);
+        pane.add(imageView,1,1);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -44,7 +51,20 @@ public class VideoProxyImpl implements VideoProxy {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void play() {
+        // TODO: this is where we might have to do the switch.
         displayActual();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void stop() {
+        mediaPlayer.stop();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public void pause() {
+        mediaPlayer.pause();
     }
 
     //////////////////////////////////////////////////////////////////////////

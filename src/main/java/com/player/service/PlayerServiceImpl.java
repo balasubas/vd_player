@@ -2,6 +2,7 @@ package com.player.service;
 
 import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
+import com.player.utils.ApplicationProperties;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,6 +34,10 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Qualifier("queueService")
     private QueueService queueService;
 
+    @Autowired
+    @Qualifier("appProperties")
+    private ApplicationProperties appProperties;
+
     private Player currentPlayer;
     private ChangeListener<? super Player> listener;
     private PropertyChangeSupport pcs;
@@ -59,7 +64,9 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
         found.ifPresent(node -> pane.getChildren().remove(node));
 
         try {
-            currentPlayer = new Player(file,this, frameService);
+            currentPlayer = new Player(file,this,
+                                       frameService, appProperties.getLogo("pending"));
+
             if(currentPlayer.getMediaPlayer() != null){
                 currentPlayer.play(gridPane);
             }
@@ -91,7 +98,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
         if(currentPlayer != null){
             if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING) ||
                     currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
-                currentPlayer.getMediaPlayer().stop();
+                currentPlayer.stop();
                 frameService.clearPlaybackPoints();
             }
         }
@@ -101,9 +108,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void pause() {
         if(currentPlayer != null){
-            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)){
-                currentPlayer.getMediaPlayer().pause();
-            }
+            currentPlayer.pause();
         }
     }
 
@@ -130,10 +135,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void resume() {
         if(currentPlayer != null){
-            if(currentPlayer.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
-                currentPlayer.getMediaPlayer().seek(currentPlayer.getPauseTime());
-                currentPlayer.getMediaPlayer().play();
-            }
+            currentPlayer.resume();
         }
     }
 
@@ -144,7 +146,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
         // JavaFX library
         if(currentPlayer != null){
             if(currentPlayer.isPlaying()) {
-                currentPlayer.getMediaPlayer().pause();
+                currentPlayer.pause();
             }
             Thread th = (new Thread(() -> {
                 currentPlayer.getMediaPlayer().setStartTime(Duration.seconds(frameService.back(2)/1000));

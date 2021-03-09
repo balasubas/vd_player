@@ -6,7 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -23,14 +22,16 @@ public class Player {
     private ConsumerService consumerService;
     private FrameService frameService;
     private VideoProxy proxy;
+    private String imagePath;
 
     //////////////////////////////////////////////////////////////////////////
     public Player( VideoFileWrapper videoFileWrapper, ConsumerService consumerService,
-                   FrameService frameService ) throws IOException {
+                   FrameService frameService, String imagePath ) throws IOException {
 
         this.videoFileWrapper = videoFileWrapper;
         this.consumerService = consumerService;
         this.frameService = frameService;
+        this.imagePath = imagePath;
 
         if(fileIsValid(videoFileWrapper)){
             media = new Media(videoFileWrapper.getVideoFile().toURI().toURL().toExternalForm());
@@ -80,8 +81,28 @@ public class Player {
 
     //////////////////////////////////////////////////////////////////////////
     public void play(GridPane gridPane){
-        proxy = new VideoProxyImpl(gridPane, getMediaPlayer());
+        proxy = new VideoProxyImpl(gridPane, getMediaPlayer(), imagePath);
         proxy.play();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public void stop(){
+        proxy.stop();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public void pause(){
+        if(mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
+            proxy.pause();
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public void resume(){
+        if(mediaPlayer.getStatus().equals(MediaPlayer.Status.PAUSED) ){
+            mediaPlayer.seek(getPauseTime());
+            proxy.play();
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -92,6 +113,7 @@ public class Player {
 
     //////////////////////////////////////////////////////////////////////////
     private void setListeners(){
+
         mediaPlayer.setOnEndOfMedia(()->{
             mediaPlayer.stop();
         });

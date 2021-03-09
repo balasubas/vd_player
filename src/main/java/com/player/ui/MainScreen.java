@@ -88,7 +88,8 @@ public class MainScreen implements ParentScreen {
 
         HBox leftSideHbox = new HBox();
         leftSideHbox.setSpacing(10);
-        leftSideHbox.getChildren().addAll(open,clear);
+        // The Label here is just for spacing
+        leftSideHbox.getChildren().addAll(new Label(" "),open,clear);
 
         leftSide.getChildren().add(leftSideHbox);
         leftSide.setMaxWidth(leftPaneWidth);
