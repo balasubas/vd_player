@@ -65,11 +65,12 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
 
         try {
             currentPlayer = new Player(file,this,
-                                       frameService, appProperties.getLogo("pending"));
+                                       frameService, appProperties.getLogo("pending"),gridPane);
 
             if(currentPlayer.getMediaPlayer() != null){
-                currentPlayer.play(gridPane);
+                currentPlayer.play();
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

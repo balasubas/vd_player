@@ -33,6 +33,8 @@ public class VideoProxyImpl implements VideoProxy {
     public void displayTemp() {
         Image img = new Image(imageLogo);
         ImageView imageView = new ImageView(img);
+        imageView.setFitWidth(250);
+        imageView.setFitHeight(150);
         pane.setAlignment(Pos.CENTER);
         pane.add(imageView,1,1);
     }
@@ -43,6 +45,7 @@ public class VideoProxyImpl implements VideoProxy {
         MediaView mediaView = new MediaView(mediaPlayer);
         mediaView.setFitWidth(450);
         mediaView.setFitHeight(350);
+
         pane.setAlignment(Pos.CENTER);
         pane.add(mediaView,1,1);
         mediaPlayer.play();
@@ -77,8 +80,7 @@ public class VideoProxyImpl implements VideoProxy {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // TODO: need to detect a loading phase to display
-        // a temp videowrapper:
-        // https://docs.oracle.com/javase/8/javafx/api/javafx/scene/media/MediaPlayer.Status.html#READY
+
         if(evt.getOldValue() == null){
             System.out.println("NOTHING HERE");
         }

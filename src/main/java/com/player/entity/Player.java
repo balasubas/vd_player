@@ -23,19 +23,24 @@ public class Player {
     private FrameService frameService;
     private VideoProxy proxy;
     private String imagePath;
+    private GridPane gridPane;
 
     //////////////////////////////////////////////////////////////////////////
     public Player( VideoFileWrapper videoFileWrapper, ConsumerService consumerService,
-                   FrameService frameService, String imagePath ) throws IOException {
+                   FrameService frameService, String imagePath, GridPane gridPane ) throws IOException {
 
         this.videoFileWrapper = videoFileWrapper;
         this.consumerService = consumerService;
         this.frameService = frameService;
         this.imagePath = imagePath;
+        this.gridPane = gridPane;
 
         if(fileIsValid(videoFileWrapper)){
             media = new Media(videoFileWrapper.getVideoFile().toURI().toURL().toExternalForm());
             mediaPlayer = new MediaPlayer(media);
+            proxy = new VideoProxyImpl(this.gridPane , mediaPlayer, imagePath);
+            proxy.displayTemp();
+            
             setListeners();
         }else{
             throw new IOException("Media file is not valid.");
@@ -80,8 +85,7 @@ public class Player {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    public void play(GridPane gridPane){
-        proxy = new VideoProxyImpl(gridPane, getMediaPlayer(), imagePath);
+    public void play(){
         proxy.play();
     }
 
