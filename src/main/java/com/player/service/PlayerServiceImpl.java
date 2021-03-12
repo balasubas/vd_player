@@ -4,7 +4,6 @@ import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
 import javafx.beans.value.ChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;

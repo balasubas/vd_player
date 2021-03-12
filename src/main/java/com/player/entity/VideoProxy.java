@@ -1,11 +1,21 @@
 package com.player.entity;
 
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.media.MediaPlayer;
+
 import java.beans.PropertyChangeListener;
 
 public interface VideoProxy extends PropertyChangeListener {
 
     //////////////////////////////////////////////////////////////////////////
-    void displayTemp();
+    default void displayTemp(GridPane pane){
+        ((ImageView)pane.getChildren().get(0)).setVisible(true);
+    };
 
     //////////////////////////////////////////////////////////////////////////
     void displayActual();
@@ -21,4 +31,7 @@ public interface VideoProxy extends PropertyChangeListener {
 
     //////////////////////////////////////////////////////////////////////////
     void fire(Object oldVal, Object newVal);
+
+    //////////////////////////////////////////////////////////////////////////
+    void setMediaPlayer(MediaPlayer mediaPlayer);
 }

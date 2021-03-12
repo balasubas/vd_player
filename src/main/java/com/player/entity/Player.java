@@ -2,7 +2,6 @@ package com.player.entity;
 
 import com.player.service.ConsumerService;
 import com.player.service.FrameService;
-import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -36,12 +35,12 @@ public class Player {
         this.gridPane = gridPane;
 
         if(fileIsValid(videoFileWrapper)){
+            proxy = new VideoProxyImpl(this.gridPane);
+            proxy.displayTemp(gridPane);
             media = new Media(videoFileWrapper.getVideoFile().toURI().toURL().toExternalForm());
             mediaPlayer = new MediaPlayer(media);
-            proxy = new VideoProxyImpl(this.gridPane , mediaPlayer, imagePath);
-            proxy.displayTemp();
-            
             setListeners();
+            proxy.setMediaPlayer(mediaPlayer);
         }else{
             throw new IOException("Media file is not valid.");
         }
@@ -143,5 +142,6 @@ public class Player {
                 frameService.addPlaybackPoint(mediaPlayer.getCurrentTime().toMillis());
             }
         });
+
     }
 }

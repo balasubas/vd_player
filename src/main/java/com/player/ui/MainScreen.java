@@ -102,6 +102,14 @@ public class MainScreen implements ParentScreen {
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
+        Image img = new Image(appProperties.getLogo("pending"));
+        ImageView imageView = new ImageView(img);
+        imageView.setFitWidth(250);
+        imageView.setFitHeight(150);
+        imageView.setVisible(false);
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.add(imageView,1,1);
+
         rightSide.getChildren().addAll(gridPane,slider,hBox);
 
         SplitPane splitPane = new SplitPane();

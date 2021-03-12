@@ -1,9 +1,10 @@
 package com.player.entity;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
@@ -18,25 +19,13 @@ public class VideoProxyImpl implements VideoProxy {
     private MediaPlayer mediaPlayer;
     private PropertyChangeSupport pcs;
     private String imageLogo;
+    private ImageView imageView;
 
     //////////////////////////////////////////////////////////////////////////
-    public VideoProxyImpl(GridPane pane, MediaPlayer mediaPlayer, String imageLogo){
+    public VideoProxyImpl(GridPane pane){
         this.pane = pane;
-        this.mediaPlayer = mediaPlayer;
-        this.imageLogo = imageLogo;
         pcs = new PropertyChangeSupport(this);
         pcs.addPropertyChangeListener(this);
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    @Override
-    public void displayTemp() {
-        Image img = new Image(imageLogo);
-        ImageView imageView = new ImageView(img);
-        imageView.setFitWidth(250);
-        imageView.setFitHeight(150);
-        pane.setAlignment(Pos.CENTER);
-        pane.add(imageView,1,1);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -78,9 +67,14 @@ public class VideoProxyImpl implements VideoProxy {
 
     //////////////////////////////////////////////////////////////////////////
     @Override
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // TODO: need to detect a loading phase to display
-
         if(evt.getOldValue() == null){
             System.out.println("NOTHING HERE");
         }
