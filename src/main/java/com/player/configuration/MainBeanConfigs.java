@@ -4,9 +4,10 @@ import com.player.service.*;
 import com.player.ui.MainScreen;
 import com.player.utils.ApplicationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
-
+@EnableScheduling
 @Component
 public class MainBeanConfigs {
 
@@ -34,4 +35,7 @@ public class MainBeanConfigs {
     @Bean("queueService")
     public QueueService getQueueService(){ return new QueueServiceImpl(); }
 
+    //////////////////////////////////////////////////////////////////////////
+    @Bean("preloadService")
+    public Preloader getPreloaderService(){ return new PreloaderServiceImpl(); }
 }

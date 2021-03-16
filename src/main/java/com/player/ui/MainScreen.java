@@ -2,6 +2,7 @@ package com.player.ui;
 
 import com.player.entity.VideoFileWrapper;
 import com.player.service.ConsumerService;
+import com.player.service.Preloader;
 import com.player.service.ProducerService;
 import com.player.utils.ApplicationProperties;
 import javafx.collections.ObservableList;
@@ -11,16 +12,22 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
-import java.util.List;
-import java.util.Objects;
+import java.net.MalformedURLException;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 
@@ -40,6 +47,10 @@ public class MainScreen implements ParentScreen {
     @Qualifier("producerService")
     private ProducerService producerService;
 
+    @Autowired
+    @Qualifier("preloadService")
+    private Preloader preloaderService;
+
     private final double leftPaneWidth = 220;
     private final double gridPaneHeight = 430;
     private final double tableViewHeight = 250;
@@ -47,9 +58,12 @@ public class MainScreen implements ParentScreen {
     private  FileChooser chooser;
     private TableView<VideoFileWrapper> tableView;
     private GridPane gridPane;
+    private Map<File,Future<MediaPlayer>> mediaQueue;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
+        mediaQueue = new HashMap<>();
+
         Stage primaryStage = new Stage();
         chooser = new FileChooser();
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
@@ -61,7 +75,7 @@ public class MainScreen implements ParentScreen {
             if(Objects.nonNull(temp)) {
                 temp.stream().filter(Objects::nonNull)
                             .forEach((file) -> {
-                                tableView.getItems().add(wrapFile(file));
+                                mediaQueue.put(file,wrapFile(file));
                             });
 
                 //This is important. Otherwise you see duplicated row displays.
@@ -102,6 +116,7 @@ public class MainScreen implements ParentScreen {
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
+        // TODO: this could be replaced by a progress bar
         Image img = new Image(appProperties.getLogo("pending"));
         ImageView imageView = new ImageView(img);
         imageView.setFitWidth(250);
@@ -262,7 +277,28 @@ public class MainScreen implements ParentScreen {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    private VideoFileWrapper wrapFile(File file){
-        return new VideoFileWrapper(new File(appProperties.getThumbNail("camera")), file);
+    private Future<MediaPlayer> wrapFile(File file){
+        preloaderService.load(file);
+        return preloaderService.getMediaPlayer();
     }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Scheduled(fixedRate = 1500)
+    private void readyVideo(){
+        if(Objects.nonNull(mediaQueue)) {
+
+            Iterator<File> fileIterator = mediaQueue.keySet().iterator();
+            while(fileIterator.hasNext()){
+                File file = fileIterator.next();
+                if(mediaQueue.get(file).isDone()){
+                    Future<MediaPlayer> mediaPlayerFuture = mediaQueue.remove(file);
+                    VideoFileWrapper videoFileWrapper =
+                            new VideoFileWrapper(new File(appProperties.getThumbNail("camera")), file, mediaPlayerFuture);
+                    tableView.getItems().add(videoFileWrapper);
+                }
+            }
+
+        }
+    }
+
 }

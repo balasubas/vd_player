@@ -3,7 +3,6 @@ package com.player.entity;
 import com.player.service.ConsumerService;
 import com.player.service.FrameService;
 import javafx.scene.layout.GridPane;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
@@ -14,8 +13,6 @@ public class Player {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
-    private MediaPlayer mediaPlayer;
-    private Media media;
     private VideoFileWrapper videoFileWrapper;
     private MediaPlayer.Status currentStatus = MediaPlayer.Status.UNKNOWN;
     private ConsumerService consumerService;
@@ -37,18 +34,11 @@ public class Player {
         if(fileIsValid(videoFileWrapper)){
             proxy = new VideoProxyImpl(this.gridPane);
             proxy.displayTemp(gridPane);
-            media = new Media(videoFileWrapper.getVideoFile().toURI().toURL().toExternalForm());
-            mediaPlayer = new MediaPlayer(media);
             setListeners();
-            proxy.setMediaPlayer(mediaPlayer);
+            proxy.setMediaPlayer(videoFileWrapper.getMediaPlayer());
         }else{
             throw new IOException("Media file is not valid.");
         }
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    public Media getMedia(){
-        return media;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -69,18 +59,18 @@ public class Player {
 
     //////////////////////////////////////////////////////////////////////////
     public  MediaPlayer getMediaPlayer(){
-        return mediaPlayer;
+        return videoFileWrapper.getMediaPlayer();
     }
 
     //////////////////////////////////////////////////////////////////////////
     public void setPlayerRate(double rate){
-        double currentRate = mediaPlayer.getRate() + rate;
-        mediaPlayer.setRate(currentRate);
+        double currentRate = videoFileWrapper.getMediaPlayer().getRate() + rate;
+        videoFileWrapper.getMediaPlayer().setRate(currentRate);
     }
 
     //////////////////////////////////////////////////////////////////////////
     public Duration getPauseTime(){
-        return mediaPlayer.getCurrentTime();
+        return videoFileWrapper.getMediaPlayer().getCurrentTime();
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -95,15 +85,15 @@ public class Player {
 
     //////////////////////////////////////////////////////////////////////////
     public void pause(){
-        if(mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
+        if(videoFileWrapper.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PLAYING)){
             proxy.pause();
         }
     }
 
     //////////////////////////////////////////////////////////////////////////
     public void resume(){
-        if(mediaPlayer.getStatus().equals(MediaPlayer.Status.PAUSED) ){
-            mediaPlayer.seek(getPauseTime());
+        if(videoFileWrapper.getMediaPlayer().getStatus().equals(MediaPlayer.Status.PAUSED) ){
+            videoFileWrapper.getMediaPlayer().seek(getPauseTime());
             proxy.play();
         }
     }
@@ -117,11 +107,11 @@ public class Player {
     //////////////////////////////////////////////////////////////////////////
     private void setListeners(){
 
-        mediaPlayer.setOnEndOfMedia(()->{
-            mediaPlayer.stop();
+        videoFileWrapper.getMediaPlayer().setOnEndOfMedia(()->{
+            videoFileWrapper.getMediaPlayer().stop();
         });
 
-        mediaPlayer.statusProperty().addListener((status,oldVal, newVal)->{
+        videoFileWrapper.getMediaPlayer().statusProperty().addListener((status,oldVal, newVal)->{
             currentStatus = newVal;
 
             if(Objects.nonNull(proxy)){
@@ -133,13 +123,13 @@ public class Player {
             }
         });
 
-        mediaPlayer.setOnStopped(()->{
-            mediaPlayer.setStartTime(Duration.ZERO);
+        videoFileWrapper.getMediaPlayer().setOnStopped(()->{
+            videoFileWrapper.getMediaPlayer().setStartTime(Duration.ZERO);
         });
 
-        mediaPlayer.currentTimeProperty().addListener((durs)->{
+        videoFileWrapper.getMediaPlayer().currentTimeProperty().addListener((durs)->{
             if(!isPaused()) {
-                frameService.addPlaybackPoint(mediaPlayer.getCurrentTime().toMillis());
+                frameService.addPlaybackPoint(videoFileWrapper.getMediaPlayer().getCurrentTime().toMillis());
             }
         });
 
