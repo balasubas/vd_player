@@ -12,11 +12,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -252,18 +248,20 @@ public class MainScreen implements ParentScreen {
                     public void updateItem(Object item, boolean empty) {
                         super.updateItem(item, empty);
 
-                        if(!empty) {
-                            VideoFileWrapper videoFileWrapper =
-                                    ((VideoFileWrapper) getTableRow().getItem());
-                            File imgFile = videoFileWrapper.getIcon();
-                            Image image = new Image(imgFile.toURI().toString());
-                            imageview.setFitHeight(50.0);
-                            imageview.setFitWidth(75.0);
-                            imageview.setImage(image);
-                            setGraphic(imageview);
-                            setText(videoFileWrapper.getVideoFile().getName());
-                        }else{
-                            imageview.setImage(null);
+                        if(getTableRow().getItem() != null) {
+                            if (!empty) {
+                                VideoFileWrapper videoFileWrapper =
+                                        ((VideoFileWrapper) getTableRow().getItem());
+                                File imgFile = videoFileWrapper.getIcon();
+                                Image image = new Image(imgFile.toURI().toString());
+                                imageview.setFitHeight(50.0);
+                                imageview.setFitWidth(75.0);
+                                imageview.setImage(image);
+                                setGraphic(imageview);
+                                setText(videoFileWrapper.getVideoFile().getName());
+                            } else {
+                                imageview.setImage(null);
+                            }
                         }
                     }
                 };
@@ -284,9 +282,8 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     @Scheduled(fixedRate = 1500)
-    private void readyVideo(){
+    private void addVideoToTableWhenReady(){
         if(Objects.nonNull(mediaQueue)) {
-
             Iterator<File> fileIterator = mediaQueue.keySet().iterator();
             while(fileIterator.hasNext()){
                 File file = fileIterator.next();
@@ -297,7 +294,6 @@ public class MainScreen implements ParentScreen {
                     tableView.getItems().add(videoFileWrapper);
                 }
             }
-
         }
     }
 

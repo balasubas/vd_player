@@ -43,7 +43,6 @@ public class VideoProxyImpl implements VideoProxy {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void play() {
-        // TODO: this is where we might have to do the switch.
         displayActual();
     }
 
