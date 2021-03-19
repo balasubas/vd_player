@@ -5,6 +5,7 @@ import com.player.service.ConsumerService;
 import com.player.service.Preloader;
 import com.player.service.ProducerService;
 import com.player.utils.ApplicationProperties;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -47,6 +48,10 @@ public class MainScreen implements ParentScreen {
     @Qualifier("preloadService")
     private Preloader preloaderService;
 
+    @Autowired
+    @Qualifier("progressWindow")
+    private ProgressWindow progressWindow;
+
     private final double leftPaneWidth = 220;
     private final double gridPaneHeight = 430;
     private final double tableViewHeight = 250;
@@ -58,6 +63,7 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
+        progressWindow.init();
         mediaQueue = new HashMap<>();
 
         Stage primaryStage = new Stage();
@@ -290,8 +296,23 @@ public class MainScreen implements ParentScreen {
                 if(mediaQueue.get(file).isDone()){
                     Future<MediaPlayer> mediaPlayerFuture = mediaQueue.remove(file);
                     VideoFileWrapper videoFileWrapper =
-                            new VideoFileWrapper(new File(appProperties.getThumbNail("camera")), file, mediaPlayerFuture);
+                            new VideoFileWrapper(new File(appProperties.getThumbNail("camera")),
+                                                          file, mediaPlayerFuture);
                     tableView.getItems().add(videoFileWrapper);
+                }else{
+                    Platform.runLater(()->{
+                        if(!progressWindow.isShowing()){
+                            progressWindow.show();
+                        }
+                    });
+                }
+            }
+
+            if(mediaQueue.isEmpty()){
+                if(progressWindow.isShowing()){
+                    Platform.runLater(()->{
+                        progressWindow.hide();
+                    });
                 }
             }
         }

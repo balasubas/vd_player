@@ -10,6 +10,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/*********************************************************************
+*
+*   This preloads the instantiation of the MediaPlayer
+*   as these objects take some time to create causing the user
+*   to have to wait. What this does is create the media player via
+*   a Future.
+*
+* ********************************************************************/
 public class PreloaderServiceImpl implements Preloader {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////

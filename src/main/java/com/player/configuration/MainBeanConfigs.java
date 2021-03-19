@@ -2,6 +2,7 @@ package com.player.configuration;
 
 import com.player.service.*;
 import com.player.ui.MainScreen;
+import com.player.ui.ProgressWindow;
 import com.player.utils.ApplicationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -38,4 +39,8 @@ public class MainBeanConfigs {
     //////////////////////////////////////////////////////////////////////////
     @Bean("preloadService")
     public Preloader getPreloaderService(){ return new PreloaderServiceImpl(); }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Bean("progressWindow")
+    public ProgressWindow getProgressWindow(){ return new ProgressWindow(); }
 }
