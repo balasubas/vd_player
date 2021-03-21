@@ -1,20 +1,29 @@
 package com.player.ui;
 
 import com.player.utils.ApplicationProperties;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
-//TODO: Implement
+//TODO:
+// now that thr progress indicator shows and updates
+// organize it in this window so that it's won indicator per line
+// also polish the display.
 public class ProgressWindow implements ParentScreen {
 
     @Autowired
@@ -24,8 +33,9 @@ public class ProgressWindow implements ParentScreen {
     //////////////////////////////  DECLARATIONS  /////////////////////////////
 
     private final String PROG_TITLE_CONST = "Video Loading Progress";
-    private Map<String, ProgressIndicator> indicatorMap;
+    private Map<Future<MediaPlayer>, ProgressIndicator> indicatorMap;
     private Stage mainStage;
+    private  HBox hBox;
 
     //////////////////////////////////////////////////////////////////////////
     public ProgressWindow(){
@@ -37,7 +47,7 @@ public class ProgressWindow implements ParentScreen {
         Stage stage = new Stage();
 
         Button hide = new Button("Hide");
-        HBox hBox = buildHbox("progr-box",100,200, Pos.BASELINE_CENTER);
+        hBox = buildHbox("progr-box",100,200, Pos.BASELINE_CENTER);
         hBox.getChildren().add(hide);
 
         StackPane gridpane = new StackPane();
@@ -83,15 +93,38 @@ public class ProgressWindow implements ParentScreen {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    public void addNewIndicator( String fileName ){
-        ProgressIndicator indicator = new ProgressIndicator();
-        indicator.setProgress(0.0);
-        indicatorMap.put(fileName, indicator);
+    public void addNewIndicator( Future<MediaPlayer> fileName ){
+        if(!indicatorMap.containsKey(fileName)) {
+            ProgressIndicator indicator = new ProgressIndicator();
+            indicator.setProgress(0.0);
+            indicatorMap.putIfAbsent(fileName, indicator);
+            hBox.getChildren().add(indicator);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////
-    public void updateProgress( String fileName ){
+    @Scheduled(fixedRate = 500)
+    public void updateProgress(){
+        if(!indicatorMap.isEmpty()){
+            indicatorMap.entrySet().forEach((entry)->{
+                if(!entry.getKey().isDone()){
+                    Platform.runLater(()->{
+                        double current = entry.getValue().getProgress();
+                        entry.getValue().setProgress(current + 0.05);
+                    });
+                }
+            });
 
+            List<Future<MediaPlayer>> removable =
+                    indicatorMap.keySet()
+                            .stream()
+                            .filter(Future::isDone)
+                            .collect(Collectors.toList());
+
+            if(!removable.isEmpty()) {
+                removable.forEach(indicatorMap::remove);
+            }
+        }
     }
 
 }

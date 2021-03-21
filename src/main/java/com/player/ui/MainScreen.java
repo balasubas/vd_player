@@ -289,6 +289,7 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     @Scheduled(fixedRate = 1500)
     private void addVideoToTableWhenReady(){
+
         if(Objects.nonNull(mediaQueue)) {
             Iterator<File> fileIterator = mediaQueue.keySet().iterator();
             while(fileIterator.hasNext()){
@@ -301,6 +302,7 @@ public class MainScreen implements ParentScreen {
                     tableView.getItems().add(videoFileWrapper);
                 }else{
                     Platform.runLater(()->{
+                        progressWindow.addNewIndicator(mediaQueue.get(file));
                         if(!progressWindow.isShowing()){
                             progressWindow.show();
                         }
