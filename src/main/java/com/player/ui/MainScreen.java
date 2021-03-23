@@ -302,7 +302,7 @@ public class MainScreen implements ParentScreen {
                     tableView.getItems().add(videoFileWrapper);
                 }else{
                     Platform.runLater(()->{
-                        progressWindow.addNewIndicator(mediaQueue.get(file));
+                        progressWindow.addNewIndicator(mediaQueue.get(file), file.getName());
                         if(!progressWindow.isShowing()){
                             progressWindow.show();
                         }

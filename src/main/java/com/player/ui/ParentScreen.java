@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 
@@ -18,6 +19,16 @@ public interface ParentScreen {
         hBox.setMinWidth(width);
         hBox.setAlignment(position);
         return hBox;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    default VBox buildVbox(String id, int height,int width, Pos position){
+        VBox vBox = new VBox();
+        vBox.setId(id);
+        vBox.setMinHeight(height);
+        vBox.setMinWidth(width);
+        vBox.setAlignment(position);
+        return vBox;
     }
 
     //////////////////////////////////////////////////////////////////////////
