@@ -9,10 +9,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,14 +52,31 @@ public class ProgressWindow implements ParentScreen {
 
 //        Button hide = new Button("Hide");
         vBox = buildVbox("progr-box",200,100, Pos.CENTER);
-        vBox.setSpacing(5);
+        vBox.setSpacing(2);
         vBox.setPadding(new Insets(10, 50, 50, 50));
         vBox.getChildren().addAll(new Label("Loading"));
 
-        StackPane gridpane = new StackPane();
-        gridpane.getChildren().add(vBox);
+        Image img = new Image(appProperties.getLogo("pending"));
+        BackgroundImage backgroundImage = new BackgroundImage(img,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(BackgroundSize.AUTO,
+                        BackgroundSize.AUTO,
+                        false,
+                        false,
+                        false,
+                        true )
+        );
 
-        Scene scene = new Scene(gridpane,appProperties.getStdWidth() - 650, appProperties.getStdHeight() - 300);
+        Background background = new Background(backgroundImage);
+
+        StackPane stackPane = new StackPane();
+        vBox.setBackground(background);
+        stackPane.getChildren().add(vBox);
+
+
+        Scene scene = new Scene(stackPane,appProperties.getStdWidth() - 650, appProperties.getStdHeight() - 300);
         scene.getStylesheets().add(appProperties.getStyleSheet());
         stage.setScene(scene);
         stage.setTitle(PROG_TITLE_CONST);
@@ -102,11 +120,21 @@ public class ProgressWindow implements ParentScreen {
         if(!indicatorMap.containsKey(fileName)) {
             ProgressIndicator indicator = new ProgressIndicator();
             indicator.setProgress(0.0);
+            indicator.setMinWidth(100);
+            indicator.setMinHeight(35);
             indicatorMap.putIfAbsent(fileName, indicator);
+
             HBox hBox = new HBox();
-            hBox.setMinWidth(100);
-            hBox.setMinHeight(25);
-            hBox.getChildren().addAll(new Label(fileActual + ": "), indicator);
+            hBox.setMinWidth(200);
+            hBox.setMinHeight(35);
+            hBox.setSpacing(2);
+            hBox.setPadding(new Insets(5, 10, 10, 10));
+            hBox.setId("prog-ind");
+
+            Label label = new Label(fileActual + ": ");
+            label.setWrapText(true);
+
+            hBox.getChildren().addAll(label, indicator);
             vBox.getChildren().addAll(hBox, new Label(""));
         }
     }
