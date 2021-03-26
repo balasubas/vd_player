@@ -1,8 +1,6 @@
 package com.player.entity;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
@@ -73,7 +71,7 @@ public class VideoProxyImpl implements VideoProxy {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // TODO: need to detect a loading phase to display
+        //TODO: do we get rid of this ?
         if(evt.getOldValue() == null){
             System.out.println("NOTHING HERE");
         }

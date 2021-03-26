@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,7 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
         progressWindow.init();
-        mediaQueue = new HashMap<>();
+        mediaQueue = new ConcurrentHashMap<>();
 
         Stage primaryStage = new Stage();
         chooser = new FileChooser();
@@ -117,15 +118,6 @@ public class MainScreen implements ParentScreen {
         Slider slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
-
-        // TODO: this could be replaced by a progress bar
-        Image img = new Image(appProperties.getLogo("pending"));
-        ImageView imageView = new ImageView(img);
-        imageView.setFitWidth(250);
-        imageView.setFitHeight(150);
-        imageView.setVisible(false);
-        gridPane.setAlignment(Pos.CENTER);
-        gridPane.add(imageView,1,1);
 
         rightSide.getChildren().addAll(gridPane,slider,hBox);
 
@@ -289,7 +281,6 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     @Scheduled(fixedRate = 1500)
     private void addVideoToTableWhenReady(){
-
         if(Objects.nonNull(mediaQueue)) {
             Iterator<File> fileIterator = mediaQueue.keySet().iterator();
             while(fileIterator.hasNext()){

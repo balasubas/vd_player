@@ -33,7 +33,6 @@ public class Player {
 
         if(fileIsValid(videoFileWrapper)){
             proxy = new VideoProxyImpl(this.gridPane);
-            proxy.displayTemp(gridPane);
             setListeners();
             proxy.setMediaPlayer(videoFileWrapper.getMediaPlayer());
         }else{

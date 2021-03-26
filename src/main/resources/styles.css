@@ -47,6 +47,10 @@
     -fx-background-color: white;
 }
 
+#clear-btn:pressed {
+    -fx-background-color: white;
+}
+
 #prog-ind {
   -fx-border-color: black;
   -fx-border-width: 1px;

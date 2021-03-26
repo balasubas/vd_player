@@ -6,23 +6,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -50,11 +44,10 @@ public class ProgressWindow implements ParentScreen {
     public Stage buildMainStage(){
         Stage stage = new Stage();
 
-//        Button hide = new Button("Hide");
         vBox = buildVbox("progr-box",200,100, Pos.CENTER);
         vBox.setSpacing(2);
         vBox.setPadding(new Insets(10, 50, 50, 50));
-        vBox.getChildren().addAll(new Label("Loading"));
+        vBox.getChildren().addAll(new Label(""));
 
         Image img = new Image(appProperties.getLogo("pending"));
         BackgroundImage backgroundImage = new BackgroundImage(img,
@@ -81,10 +74,6 @@ public class ProgressWindow implements ParentScreen {
         stage.setScene(scene);
         stage.setTitle(PROG_TITLE_CONST);
         stage.setResizable(false);
-
-//        hide.setOnMouseClicked((evt)->{
-//            stage.hide();
-//        });
 
         return stage;
     }
@@ -143,6 +132,12 @@ public class ProgressWindow implements ParentScreen {
     @Scheduled(fixedRate = 500)
     public void updateProgress(){
         if(!indicatorMap.isEmpty()){
+            Platform.runLater(() -> {
+                        if(!((Label)(vBox.getChildren().get(0))).getText().equals("Loading")){
+                            ((Label)(vBox.getChildren().get(0))).setText("Loading");
+                        }
+                    });
+
             indicatorMap.forEach((key, value) -> {
                 if (!key.isDone()) {
                     Platform.runLater(() -> {
@@ -172,6 +167,10 @@ public class ProgressWindow implements ParentScreen {
                     });
                 });
             }
+        }else{
+           if(Objects.nonNull(vBox)) {
+               Platform.runLater(() -> ((Label) (vBox.getChildren().get(0))).setText(""));
+           }
         }
     }
 
