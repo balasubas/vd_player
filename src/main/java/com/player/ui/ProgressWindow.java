@@ -167,6 +167,7 @@ public class ProgressWindow implements ParentScreen {
                     });
                 });
             }
+
         }else{
            if(Objects.nonNull(vBox)) {
                Platform.runLater(() -> ((Label) (vBox.getChildren().get(0))).setText(""));

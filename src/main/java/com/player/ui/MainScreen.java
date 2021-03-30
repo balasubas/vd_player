@@ -281,6 +281,11 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     @Scheduled(fixedRate = 1500)
     private void addVideoToTableWhenReady(){
+        // TODO: While this iterator is happening, when attempting to load a new video
+        //       the video being loaded is ignored due to a concurrent hashmap
+        //       1. Maybe place this in a new service called a Queuing service
+        //       2. use a temp queue if this is still working to load something
+        //       3. when done loading, transfer from temp queue to this queue
         if(Objects.nonNull(mediaQueue)) {
             Iterator<File> fileIterator = mediaQueue.keySet().iterator();
             while(fileIterator.hasNext()){
