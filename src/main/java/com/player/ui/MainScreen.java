@@ -4,6 +4,7 @@ import com.player.entity.VideoFileWrapper;
 import com.player.service.ConsumerService;
 import com.player.service.Preloader;
 import com.player.service.ProducerService;
+import com.player.service.QueueService;
 import com.player.utils.ApplicationProperties;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -53,6 +54,10 @@ public class MainScreen implements ParentScreen {
     @Qualifier("progressWindow")
     private ProgressWindow progressWindow;
 
+    @Autowired
+    @Qualifier("queueService")
+    private QueueService queueService;
+
     private final double leftPaneWidth = 220;
     private final double gridPaneHeight = 430;
     private final double tableViewHeight = 250;
@@ -78,7 +83,7 @@ public class MainScreen implements ParentScreen {
             if(Objects.nonNull(temp)) {
                 temp.stream().filter(Objects::nonNull)
                             .forEach((file) -> {
-                                mediaQueue.put(file,wrapFile(file));
+                                queueService.addToMediaQueue(file);
                             });
 
                 //This is important. Otherwise you see duplicated row displays.
@@ -273,47 +278,64 @@ public class MainScreen implements ParentScreen {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    private Future<MediaPlayer> wrapFile(File file){
-        preloaderService.load(file);
-        return preloaderService.getMediaPlayer();
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    @Scheduled(fixedRate = 1500)
+    @Scheduled(fixedRate = 1000)
     private void addVideoToTableWhenReady(){
         // TODO: While this iterator is happening, when attempting to load a new video
         //       the video being loaded is ignored due to a concurrent hashmap
         //       1. Maybe place this in a new service called a Queuing service
         //       2. use a temp queue if this is still working to load something
         //       3. when done loading, transfer from temp queue to this queue
-        if(Objects.nonNull(mediaQueue)) {
-            Iterator<File> fileIterator = mediaQueue.keySet().iterator();
-            while(fileIterator.hasNext()){
-                File file = fileIterator.next();
-                if(mediaQueue.get(file).isDone()){
-                    Future<MediaPlayer> mediaPlayerFuture = mediaQueue.remove(file);
-                    VideoFileWrapper videoFileWrapper =
-                            new VideoFileWrapper(new File(appProperties.getThumbNail("camera")),
-                                                          file, mediaPlayerFuture);
-                    tableView.getItems().add(videoFileWrapper);
-                }else{
-                    Platform.runLater(()->{
-                        progressWindow.addNewIndicator(mediaQueue.get(file), file.getName());
-                        if(!progressWindow.isShowing()){
-                            progressWindow.show();
-                        }
+//        if(Objects.nonNull(mediaQueue)) {
+//            Iterator<File> fileIterator = mediaQueue.keySet().iterator();
+//            while(fileIterator.hasNext()){
+//
+//
+//
+//                File file = fileIterator.next();
+//                if(mediaQueue.get(file).isDone()){
+//                    Future<MediaPlayer> mediaPlayerFuture = mediaQueue.remove(file);
+//                    VideoFileWrapper videoFileWrapper =
+//                            new VideoFileWrapper(new File(appProperties.getThumbNail("camera")),
+//                                                          file, mediaPlayerFuture);
+//                    tableView.getItems().add(videoFileWrapper);
+//                }else{
+//                    Platform.runLater(()->{
+//                        progressWindow.addNewIndicator(mediaQueue.get(file), file.getName());
+//                        if(!progressWindow.isShowing()){
+//                            progressWindow.show();
+//                        }
+//                    });
+//                }
+//            }
+
+            Map<File, Future<MediaPlayer>> pending = queueService.getPending();
+            if(!pending.isEmpty()){
+                Platform.runLater(()->{
+                    pending.entrySet().stream().forEach((entry)->{
+                        File file = entry.getKey();
+                        progressWindow.addNewIndicator(entry.getValue(), file.getName());
                     });
-                }
+
+                    if(!progressWindow.isShowing()){
+                        progressWindow.show();
+                    }
+                });
             }
 
-            if(mediaQueue.isEmpty()){
+            List<VideoFileWrapper> videoFileWrappers = queueService.cleanQueue();
+            if(!videoFileWrappers.isEmpty()){
+                tableView.getItems().addAll(videoFileWrappers);
+            }
+
+            if(queueService.getMediaQueue().isEmpty()){
                 if(progressWindow.isShowing()){
                     Platform.runLater(()->{
                         progressWindow.hide();
                     });
                 }
             }
-        }
-    }
 
+            queueService.transfer();
+
+        }
 }
