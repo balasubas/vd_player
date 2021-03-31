@@ -66,13 +66,14 @@ public class MainScreen implements ParentScreen {
     private TableView<VideoFileWrapper> tableView;
     private GridPane gridPane;
     private Map<File,Future<MediaPlayer>> mediaQueue;
+    private Stage primaryStage;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
         progressWindow.init();
         mediaQueue = new ConcurrentHashMap<>();
 
-        Stage primaryStage = new Stage();
+        primaryStage = new Stage();
         chooser = new FileChooser();
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
@@ -98,6 +99,13 @@ public class MainScreen implements ParentScreen {
                 if(consumerService.isPlaying()){
                     consumerService.stop();
                 }
+
+                gridPane.getChildren().stream().forEach((node)->{
+                    if(node.getClass().equals(MediaView.class)){
+                        ((MediaView) node).getMediaPlayer().dispose();
+                    }
+                });
+
                 gridPane.getChildren().removeIf((node)-> node.getClass().equals(MediaView.class));
             }
         });
@@ -146,9 +154,7 @@ public class MainScreen implements ParentScreen {
         TableView.TableViewSelectionModel<VideoFileWrapper> selectionModel = tableView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
         tableView.setSelectionModel(selectionModel);
-
         configTableColumns();
-
         vBox.getChildren().add(tableView);
         vBox.setSpacing(spacing);
 
@@ -192,7 +198,6 @@ public class MainScreen implements ParentScreen {
                     consumerService.playFromQueue(gridPane);
                 }
             }
-
         });
 
         Button fastForward = setImage(new Button(), "forward","ui-control");
@@ -280,62 +285,33 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     @Scheduled(fixedRate = 1000)
     private void addVideoToTableWhenReady(){
-        // TODO: While this iterator is happening, when attempting to load a new video
-        //       the video being loaded is ignored due to a concurrent hashmap
-        //       1. Maybe place this in a new service called a Queuing service
-        //       2. use a temp queue if this is still working to load something
-        //       3. when done loading, transfer from temp queue to this queue
-//        if(Objects.nonNull(mediaQueue)) {
-//            Iterator<File> fileIterator = mediaQueue.keySet().iterator();
-//            while(fileIterator.hasNext()){
-//
-//
-//
-//                File file = fileIterator.next();
-//                if(mediaQueue.get(file).isDone()){
-//                    Future<MediaPlayer> mediaPlayerFuture = mediaQueue.remove(file);
-//                    VideoFileWrapper videoFileWrapper =
-//                            new VideoFileWrapper(new File(appProperties.getThumbNail("camera")),
-//                                                          file, mediaPlayerFuture);
-//                    tableView.getItems().add(videoFileWrapper);
-//                }else{
-//                    Platform.runLater(()->{
-//                        progressWindow.addNewIndicator(mediaQueue.get(file), file.getName());
-//                        if(!progressWindow.isShowing()){
-//                            progressWindow.show();
-//                        }
-//                    });
-//                }
-//            }
-
-            Map<File, Future<MediaPlayer>> pending = queueService.getPending();
-            if(!pending.isEmpty()){
-                Platform.runLater(()->{
-                    pending.entrySet().stream().forEach((entry)->{
-                        File file = entry.getKey();
-                        progressWindow.addNewIndicator(entry.getValue(), file.getName());
-                    });
-
-                    if(!progressWindow.isShowing()){
-                        progressWindow.show();
-                    }
+        Map<File, Future<MediaPlayer>> pending = queueService.getPending();
+        if(!pending.isEmpty()){
+             Platform.runLater(()->{
+                pending.entrySet().stream().forEach((entry)->{
+                    File file = entry.getKey();
+                    progressWindow.addNewIndicator(entry.getValue(), file.getName());
                 });
-            }
 
-            List<VideoFileWrapper> videoFileWrappers = queueService.cleanQueue();
-            if(!videoFileWrappers.isEmpty()){
-                tableView.getItems().addAll(videoFileWrappers);
-            }
-
-            if(queueService.getMediaQueue().isEmpty()){
-                if(progressWindow.isShowing()){
-                    Platform.runLater(()->{
-                        progressWindow.hide();
-                    });
+                if(!progressWindow.isShowing()){
+                    progressWindow.show(primaryStage.getX());
                 }
-            }
-
-            queueService.transfer();
-
+             });
         }
+
+        List<VideoFileWrapper> videoFileWrappers = queueService.cleanQueue();
+        if(!videoFileWrappers.isEmpty()){
+           tableView.getItems().addAll(videoFileWrappers);
+        }
+
+        if(queueService.getMediaQueue().isEmpty()){
+           if(progressWindow.isShowing()){
+               Platform.runLater(()->{
+                  progressWindow.hide();
+               });
+           }
+        }
+
+        queueService.transfer();
+    }
 }

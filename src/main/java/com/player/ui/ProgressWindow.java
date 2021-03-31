@@ -20,8 +20,6 @@ import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-//TODO:
-// polish the display and layout.
 public class ProgressWindow implements ParentScreen {
 
     @Autowired
@@ -79,8 +77,9 @@ public class ProgressWindow implements ParentScreen {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    public void show(){
+    public void show(double parentXcoord){
         if(mainStage != null){
+            mainStage.setX(parentXcoord - 250);
             mainStage.show();
         }
     }
