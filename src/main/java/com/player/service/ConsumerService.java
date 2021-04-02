@@ -1,6 +1,7 @@
 package com.player.service;
 
 import com.player.entity.VideoFileWrapper;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 
 public interface ConsumerService {
@@ -37,4 +38,7 @@ public interface ConsumerService {
 
     //////////////////////////////////////////////////////////////////////////
     void fire(String oldVal, String newVal);
+
+    //////////////////////////////////////////////////////////////////////////
+    void setSlider(Slider slider);
 }

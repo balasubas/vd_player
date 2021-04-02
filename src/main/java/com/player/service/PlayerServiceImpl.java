@@ -3,8 +3,10 @@ package com.player.service;
 import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
@@ -41,6 +43,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     private ChangeListener<? super Player> listener;
     private PropertyChangeSupport pcs;
     private Pane pane;
+    private Slider slider;
     private boolean isPlayingFromQueue = false;
     private final Duration REWIND_CONST = new Duration(100);
 
@@ -66,7 +69,11 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             currentPlayer = new Player(file,this,
                                        frameService, appProperties.getLogo("pending"),gridPane);
 
+            //TODO: Add a listener to the slider for playback
             if(currentPlayer.getMediaPlayer() != null){
+                currentPlayer.getMediaPlayer()
+                             .currentTimeProperty()
+                             .addListener((evt)-> updateSlider());
                 currentPlayer.play();
             }
 
@@ -191,6 +198,12 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
 
     //////////////////////////////////////////////////////////////////////////
     @Override
+    public void setSlider(Slider slider) {
+        this.slider = slider;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final String stopped = "STOPPED";
 
@@ -202,5 +215,15 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
                 isPlayingFromQueue = false;
             }
         }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private void updateSlider(){
+        Platform.runLater(()->{
+            Duration currentTime = currentPlayer.getMediaPlayer().getCurrentTime();
+            slider.setValue((currentTime.toMillis() /
+                    currentPlayer.getMediaPlayer().getTotalDuration().toMillis())
+                    * 100.0 );
+        });
     }
 }

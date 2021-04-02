@@ -16,8 +16,6 @@ public class VideoProxyImpl implements VideoProxy {
     private GridPane pane;
     private MediaPlayer mediaPlayer;
     private PropertyChangeSupport pcs;
-    private String imageLogo;
-    private ImageView imageView;
 
     //////////////////////////////////////////////////////////////////////////
     public VideoProxyImpl(GridPane pane){

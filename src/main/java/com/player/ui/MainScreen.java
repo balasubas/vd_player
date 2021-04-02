@@ -67,6 +67,7 @@ public class MainScreen implements ParentScreen {
     private GridPane gridPane;
     private Map<File,Future<MediaPlayer>> mediaQueue;
     private Stage primaryStage;
+    private Slider slider;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
@@ -128,7 +129,9 @@ public class MainScreen implements ParentScreen {
         VBox rightSide = new VBox(new Label("Now Playing ... "));
         HBox hBox = configureVidControls();
 
-        Slider slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
+        slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
+        consumerService.setSlider(slider);
+
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
