@@ -4,6 +4,8 @@ import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Slider;
@@ -69,11 +71,22 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             currentPlayer = new Player(file,this,
                                        frameService, appProperties.getLogo("pending"),gridPane);
 
-            //TODO: Add a listener to the slider for playback
             if(currentPlayer.getMediaPlayer() != null){
                 currentPlayer.getMediaPlayer()
                              .currentTimeProperty()
                              .addListener((evt)-> updateSlider());
+
+
+                slider.valueProperty().addListener( observable -> {
+                    if(slider.isValueChanging()){
+                        Duration duration =
+                                currentPlayer.getMediaPlayer().getTotalDuration();
+
+                        currentPlayer.getMediaPlayer()
+                                     .seek(duration.multiply( slider.getValue() / 100 ));
+                    }
+                });
+
                 currentPlayer.play();
             }
 

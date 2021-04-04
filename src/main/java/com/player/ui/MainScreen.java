@@ -84,12 +84,7 @@ public class MainScreen implements ParentScreen {
             List<File> temp = chooser.showOpenMultipleDialog(primaryStage);
             if(Objects.nonNull(temp)) {
                 temp.stream().filter(Objects::nonNull)
-                            .forEach((file) -> {
-                                queueService.addToMediaQueue(file);
-                            });
-
-                //This is important. Otherwise you see duplicated row displays.
-                tableView.refresh();
+                            .forEach((file) -> queueService.addToMediaQueue(file));
             }
         });
 
@@ -107,7 +102,13 @@ public class MainScreen implements ParentScreen {
                     }
                 });
 
-                gridPane.getChildren().removeIf((node)-> node.getClass().equals(MediaView.class));
+                gridPane.getChildren().stream()
+                        .filter((node)-> node.getClass().equals(MediaView.class))
+                        .map((node)-> ((MediaView) node).getMediaPlayer())
+                        .forEach(MediaPlayer::dispose);
+
+                gridPane.getChildren()
+                        .removeIf((node)-> node.getClass().equals(MediaView.class));
             }
         });
 
@@ -305,6 +306,9 @@ public class MainScreen implements ParentScreen {
         List<VideoFileWrapper> videoFileWrappers = queueService.cleanQueue();
         if(!videoFileWrappers.isEmpty()){
            tableView.getItems().addAll(videoFileWrappers);
+
+            //This is important. Otherwise you see duplicated row displays.
+           tableView.refresh();
         }
 
         if(queueService.getMediaQueue().isEmpty()){
