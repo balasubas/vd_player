@@ -40,23 +40,14 @@ public class MainPlayerWindow extends Application {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    // TODO: Fix the shutdown process to where we
-    // do not need to invokde kill -9 externally.
     private EventHandler<WindowEvent> shutdownSequence(){
         return (event)->{
             Platform.runLater(()->{
-                String os = System.getProperty("os.name");
-                String command = "kill -9 " + pid;
                 try {
                     applicationContext.close();
                     this.stop();
                     Platform.exit();
-
-                    //TODO: Not satisified with this
-                    // this might be dangerous.
-                    if(os.contains("Mac OS")){
-                        Runtime.getRuntime().exec(command);
-                    }
+                    System.exit(0);
 
                 } catch (Exception e) {
                     e.printStackTrace();
