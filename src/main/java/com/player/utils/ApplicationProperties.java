@@ -46,6 +46,9 @@ public class ApplicationProperties {
     @Value("${clear.btn.tooltip}")
     private String clearBtnToolTip;
 
+    @Value("${playlist.dir}")
+    private String playlistSubdir;
+
     //////////////////////////////////////////////////////////////////////////
     public int getStdHeight() {
         return stdHeight;
@@ -140,6 +143,12 @@ public class ApplicationProperties {
     //////////////////////////////////////////////////////////////////////////
     public double getStdRateIncrease(){
         return stdRateIncrease;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public String getPlaylistDir(){
+        String currDir = System.getProperty("user.dir");
+        return currDir + playlistSubdir;
     }
 
 }

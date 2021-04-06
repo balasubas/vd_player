@@ -68,10 +68,11 @@ public class MainScreen implements ParentScreen {
     private Map<File,Future<MediaPlayer>> mediaQueue;
     private Stage primaryStage;
     private Slider slider;
+    private MenuBar menuBar;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
-        progressWindow.init();
+        init();
         mediaQueue = new ConcurrentHashMap<>();
 
         primaryStage = new Stage();
@@ -136,7 +137,7 @@ public class MainScreen implements ParentScreen {
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
-        rightSide.getChildren().addAll(gridPane,slider,hBox);
+        rightSide.getChildren().addAll(menuBar,gridPane,slider,hBox);
 
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(leftSide,rightSide);
@@ -320,5 +321,25 @@ public class MainScreen implements ParentScreen {
         }
 
         queueService.transfer();
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private void init(){
+        progressWindow.init();
+        File playlistDir = new File(appProperties.getPlaylistDir());
+        if(!playlistDir.exists()){
+            playlistDir.mkdir();
+        }
+
+        // TODO: style this menu bar
+        //      - implement each menu item.
+        menuBar = new MenuBar();
+        MenuItem savePlaylist = new MenuItem("Save Playlist");
+        MenuItem loadPlayList = new MenuItem("Load Playlist");
+        MenuItem loadAutoSaved = new MenuItem("Load Auto Saved");
+
+        Menu menu = new Menu("File");
+        menu.getItems().addAll(savePlaylist,loadPlayList,loadAutoSaved);
+        menuBar.getMenus().add(menu);
     }
 }
