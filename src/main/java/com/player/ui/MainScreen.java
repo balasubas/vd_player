@@ -1,10 +1,7 @@
 package com.player.ui;
 
 import com.player.entity.VideoFileWrapper;
-import com.player.service.ConsumerService;
-import com.player.service.Preloader;
-import com.player.service.ProducerService;
-import com.player.service.QueueService;
+import com.player.service.*;
 import com.player.utils.ApplicationProperties;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -58,6 +55,10 @@ public class MainScreen implements ParentScreen {
     @Qualifier("queueService")
     private QueueService queueService;
 
+    @Autowired
+    @Qualifier("fileService")
+    private FileService fileService;
+
     private final double leftPaneWidth = 220;
     private final double gridPaneHeight = 430;
     private final double tableViewHeight = 250;
@@ -74,7 +75,6 @@ public class MainScreen implements ParentScreen {
     public Stage buildMainStage(){
         init();
         mediaQueue = new ConcurrentHashMap<>();
-
         primaryStage = new Stage();
         chooser = new FileChooser();
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
@@ -97,7 +97,7 @@ public class MainScreen implements ParentScreen {
                     consumerService.stop();
                 }
 
-                gridPane.getChildren().stream().forEach((node)->{
+                gridPane.getChildren().forEach((node)->{
                     if(node.getClass().equals(MediaView.class)){
                         ((MediaView) node).getMediaPlayer().dispose();
                     }
@@ -331,14 +331,20 @@ public class MainScreen implements ParentScreen {
             playlistDir.mkdir();
         }
 
-        // TODO: style this menu bar
-        //      - implement each menu item.
         menuBar = new MenuBar();
+        menuBar.setId("menu-main");
+
         MenuItem savePlaylist = new MenuItem("Save Playlist");
+        savePlaylist.setId("menu-item");
+
         MenuItem loadPlayList = new MenuItem("Load Playlist");
+        loadPlayList.setId("menu-item");
+
         MenuItem loadAutoSaved = new MenuItem("Load Auto Saved");
+        loadAutoSaved.setId("menu-item");
 
         Menu menu = new Menu("File");
+
         menu.getItems().addAll(savePlaylist,loadPlayList,loadAutoSaved);
         menuBar.getMenus().add(menu);
     }

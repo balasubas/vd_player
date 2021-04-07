@@ -43,4 +43,9 @@ public class MainBeanConfigs {
     //////////////////////////////////////////////////////////////////////////
     @Bean("progressWindow")
     public ProgressWindow getProgressWindow(){ return new ProgressWindow(); }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Bean("fileService")
+    public FileService getFileService(){ return new FileServiceImpl(); }
+
 }
