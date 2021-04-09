@@ -8,18 +8,18 @@ import java.util.List;
 public interface FileService {
 
     //////////////////////////////////////////////////////////////////////////
-    void savePlaylist(List<VideoFileWrapper> videoFiles);
+    void savePlaylist(List<VideoFileWrapper> videoFiles, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    List<VideoFileWrapper> loadPlaylist(String fileName);
+    List<VideoFileWrapper> loadPlaylist(String fileName, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    boolean deletePlayList(String fileName);
+    boolean deletePlayList(String fileName, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    void saveDefaultPlaylist(List<File> files);
+    void saveDefaultPlaylist(List<File> files, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    VideoFileWrapper loadDefaultPlaylist();
+    VideoFileWrapper loadDefaultPlaylist(String location);
 
 }
