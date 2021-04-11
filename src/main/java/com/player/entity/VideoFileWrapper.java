@@ -19,9 +19,7 @@ public class VideoFileWrapper {
         this.setVideoFile(videoFile);
         try {
             this.mediaPlayer = mediaPlayer.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch ( ExecutionException  | InterruptedException e) {
             e.printStackTrace();
         }
     }

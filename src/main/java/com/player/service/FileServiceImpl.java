@@ -5,12 +5,10 @@ import com.player.entity.PlayList;
 import com.player.entity.PlayListItem;
 import com.player.entity.VideoFileWrapper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,8 +27,8 @@ public class FileServiceImpl implements FileService {
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public void savePlaylist(List<VideoFileWrapper> videoFiles, String location) {
-        File file = new File(location);
+    public void savePlaylist(List<VideoFileWrapper> videoFiles,String name, String location) {
+        File file = new File(location + "/" + name);
         if(file.exists()){
             try {
                 FileUtils.deleteQuietly(file);

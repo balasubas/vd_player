@@ -8,7 +8,7 @@ import java.util.List;
 public interface FileService {
 
     //////////////////////////////////////////////////////////////////////////
-    void savePlaylist(List<VideoFileWrapper> videoFiles, String location);
+    void savePlaylist(List<VideoFileWrapper> videoFiles, String name, String location);
 
     //////////////////////////////////////////////////////////////////////////
     List<VideoFileWrapper> loadPlaylist(String fileName, String location);
