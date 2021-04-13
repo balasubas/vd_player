@@ -9,7 +9,9 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,33 +30,13 @@ public class FileServiceImpl implements FileService {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void savePlaylist(List<VideoFileWrapper> videoFiles,String name, String location) {
-        File file = new File(location + "/" + name);
-        if(file.exists()){
-            try {
-                FileUtils.deleteQuietly(file);
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<File> files = videoFiles.stream()
-                                     .map(VideoFileWrapper::getVideoFile)
-                                     .collect(Collectors.toList());
-
-        PlayList playList = parseToPlayList(files, file.getName());
-        String jsonString = gson.toJson(playList);
-        try {
-            FileUtils.writeStringToFile(file,jsonString, Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        save( videoFiles, name, location);
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public List<VideoFileWrapper> loadPlaylist(String fileName, String location) {
-        return null;
+    public List<File> loadPlaylist(String fileName, String location) {
+        return load(fileName, location);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -65,13 +47,21 @@ public class FileServiceImpl implements FileService {
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public void saveDefaultPlaylist(List<File> files, String location) {
-
+    public void saveDefaultPlaylist(List<VideoFileWrapper> videoFiles, String location) {
+        save( videoFiles, DEFAULT_PLAYLIST_NAME, location);
     }
 
     //////////////////////////////////////////////////////////////////////////
     @Override
-    public VideoFileWrapper loadDefaultPlaylist(String location) {
+    public File loadDefaultPlaylist(String location) {
+        List<File> files = load(DEFAULT_PLAYLIST_NAME, location);
+
+        if(Objects.nonNull(files)){
+            if(!files.isEmpty()){
+                return files.get(0);
+            }
+        }
+
         return null;
     }
 
@@ -85,6 +75,57 @@ public class FileServiceImpl implements FileService {
 
         playList.setPlayListItems(playListItemSet);
         return playList;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private void save(List<VideoFileWrapper> videoFiles,String name, String location){
+        File file = new File(location + "/" + name);
+        if(file.exists()){
+            try {
+                FileUtils.deleteQuietly(file);
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<File> files = videoFiles.stream()
+                .map(VideoFileWrapper::getVideoFile)
+                .collect(Collectors.toList());
+
+        PlayList playList = parseToPlayList(files, file.getName());
+        String jsonString = gson.toJson(playList);
+
+        try {
+            FileUtils.writeStringToFile(file,jsonString, Charset.defaultCharset());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private List<File> load(String fileName, String location){
+        List<File> videoFiles = null;
+        File playlistFile = Paths.get(location, fileName).toFile();
+
+        if(playlistFile.exists() && playlistFile.isFile()){
+            try {
+                String jsonString = FileUtils.readLines(playlistFile,"UTF-8")
+                        .stream()
+                        .reduce("",(s1,s2)->{ return s1 + "" + s2;});
+
+                PlayList playList = gson.fromJson(jsonString,PlayList.class);
+                videoFiles = playList.getPlayListItems()
+                        .stream()
+                        .map(PlayListItem::getLocation)
+                        .collect(Collectors.toList());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return videoFiles;
     }
 
 }

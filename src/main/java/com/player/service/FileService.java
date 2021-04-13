@@ -11,15 +11,15 @@ public interface FileService {
     void savePlaylist(List<VideoFileWrapper> videoFiles, String name, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    List<VideoFileWrapper> loadPlaylist(String fileName, String location);
+    List<File> loadPlaylist(String fileName, String location);
 
     //////////////////////////////////////////////////////////////////////////
     boolean deletePlayList(String fileName, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    void saveDefaultPlaylist(List<File> files, String location);
+    void saveDefaultPlaylist(List<VideoFileWrapper> videoFiles, String location);
 
     //////////////////////////////////////////////////////////////////////////
-    VideoFileWrapper loadDefaultPlaylist(String location);
+    File loadDefaultPlaylist(String location);
 
 }

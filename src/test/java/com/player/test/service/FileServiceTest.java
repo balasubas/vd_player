@@ -7,10 +7,8 @@ import com.player.service.Preloader;
 import com.player.service.PreloaderServiceImpl;
 import com.player.test.util.PropHelper;
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.*;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +27,7 @@ public class FileServiceTest {
     private static PropHelper propHelper;
     private static List<VideoFileWrapper> wrappers;
     private static Preloader preloader;
+    private static final String stdName = "play_one.json";
 
     //////////////////////////////////////////////////////////////////////////
     @BeforeClass
@@ -52,6 +51,8 @@ public class FileServiceTest {
             Paths.get(propHelper.getTempFileDirectory()).toFile().mkdir();
         }
 
+        fileService.savePlaylist(wrappers,stdName,propHelper.getTempFileDirectory());
+        fileService.saveDefaultPlaylist(wrappers,propHelper.getTempFileDirectory());
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -68,8 +69,6 @@ public class FileServiceTest {
     //////////////////////////////////////////////////////////////////////////
     @Test
     public void parsePlaylistToJsonTest(){
-        final String stdName = "play_one.json";
-        fileService.savePlaylist(wrappers,stdName,propHelper.getTempFileDirectory());
         try {
             List<File> fileList =
                     Files.list(Paths.get(propHelper.getTempFileDirectory()))
@@ -79,11 +78,17 @@ public class FileServiceTest {
             Assert.assertFalse(fileList.isEmpty());
 
             Optional<String> found = fileList.stream()
-                                             .map((file)->{
-                                                 return file.getName();})
-                                             .filter((fileName)->{
-                                                return fileName.equals(stdName);
-                                             }).findFirst();
+                                             .map(File::getName)
+                                             .filter((fileName)-> fileName.equals(stdName))
+                                             .findFirst();
+
+            Assert.assertTrue(found.isPresent());
+
+            found = fileList.stream()
+                    .map(File::getName)
+                    .filter((fileName)-> fileName.equals("auto_save.json"))
+                    .findFirst();
+
             Assert.assertTrue(found.isPresent());
 
         } catch (IOException e) {
@@ -91,9 +96,20 @@ public class FileServiceTest {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////
+
     @Test
     public void loadPlayListTest(){
-        //TODO: Implement
+        List<File> files =
+                fileService.loadPlaylist(stdName,propHelper.getTempFileDirectory());
+
+        Assert.assertNotNull(files);
+        Assert.assertFalse(files.isEmpty());
+
+        File defaultFile = fileService.loadDefaultPlaylist(propHelper.getTempFileDirectory());
+
+        Assert.assertNotNull(defaultFile);
+
     }
     //////////////////////////////////////////////////////////////////////////
     private  static List<VideoFileWrapper> parseToVidWrapper(List<File> files){
