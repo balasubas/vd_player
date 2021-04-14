@@ -1,5 +1,6 @@
 package com.player.test.service;
 
+import com.player.entity.PlayList;
 import com.player.entity.VideoFileWrapper;
 import com.player.service.FileService;
 import com.player.service.FileServiceImpl;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -109,6 +112,14 @@ public class FileServiceTest {
         File defaultFile = fileService.loadDefaultPlaylist(propHelper.getTempFileDirectory());
 
         Assert.assertNotNull(defaultFile);
+
+        PlayList defaultPlaylist =
+                fileService.parseToPlayList(Collections.singletonList(defaultFile),"default");
+
+        defaultPlaylist.getPlayListItems().forEach((item)->{
+            Assert.assertTrue(item.getLocation().exists());
+            Assert.assertTrue(item.getLocation().isFile());
+        });
 
     }
     //////////////////////////////////////////////////////////////////////////

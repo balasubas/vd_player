@@ -1,5 +1,6 @@
 package com.player.service;
 
+import com.player.entity.PlayList;
 import com.player.entity.VideoFileWrapper;
 
 import java.io.File;
@@ -21,5 +22,11 @@ public interface FileService {
 
     //////////////////////////////////////////////////////////////////////////
     File loadDefaultPlaylist(String location);
+
+    //////////////////////////////////////////////////////////////////////////
+    String getDefaultPlayListName();
+
+    //////////////////////////////////////////////////////////////////////////
+    PlayList parseToPlayList(List<File> files, String playListName);
 
 }

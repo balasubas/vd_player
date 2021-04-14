@@ -66,7 +66,14 @@ public class FileServiceImpl implements FileService {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    private PlayList parseToPlayList(List<File> files, String playListName){
+    @Override
+    public String getDefaultPlayListName() {
+        return DEFAULT_PLAYLIST_NAME;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    @Override
+    public PlayList parseToPlayList(List<File> files, String playListName){
         PlayList playList = new PlayList( (playListName == null ) ? DEFAULT_PLAYLIST_NAME : playListName );
 
         Set<PlayListItem> playListItemSet = files.stream()

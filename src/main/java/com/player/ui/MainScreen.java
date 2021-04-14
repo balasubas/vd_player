@@ -1,5 +1,7 @@
 package com.player.ui;
 
+import com.player.entity.PlayList;
+import com.player.entity.PlayListItem;
 import com.player.entity.VideoFileWrapper;
 import com.player.service.*;
 import com.player.utils.ApplicationProperties;
@@ -70,6 +72,7 @@ public class MainScreen implements ParentScreen {
     private Stage primaryStage;
     private Slider slider;
     private MenuBar menuBar;
+
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
@@ -308,7 +311,12 @@ public class MainScreen implements ParentScreen {
         if(!videoFileWrappers.isEmpty()){
            tableView.getItems().addAll(videoFileWrappers);
 
-            //This is important. Otherwise you see duplicated row displays.
+           List<VideoFileWrapper> currentVids =
+                   new ArrayList<>(tableView.getItems());
+
+           fileService.saveDefaultPlaylist(currentVids, appProperties.getPlaylistDir());
+
+           //This is important. Otherwise you see duplicated row displays.
            tableView.refresh();
         }
 
@@ -342,6 +350,22 @@ public class MainScreen implements ParentScreen {
 
         MenuItem loadAutoSaved = new MenuItem("Load Auto Saved");
         loadAutoSaved.setId("menu-item");
+        loadAutoSaved.setOnAction((event)->{
+            File file = fileService.loadDefaultPlaylist(appProperties.getPlaylistDir());
+            if(Objects.nonNull(file)) {
+                PlayList autoPlayList = fileService.parseToPlayList(Collections.singletonList(file),
+                        fileService.getDefaultPlayListName());
+                if (!autoPlayList.getPlayListItems().isEmpty()) {
+                    // TODO: This is not loading the file's absolute path
+                    autoPlayList.getPlayListItems()
+                            .stream()
+                            .map(PlayListItem::getLocation)
+                            .forEach((fileItem)->{
+                                queueService.addToMediaQueue(fileItem);
+                            });
+                }
+            }
+        });
 
         Menu menu = new Menu("File");
 
