@@ -1,6 +1,7 @@
 package com.player.service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.player.entity.PlayList;
 import com.player.entity.PlayListItem;
 import com.player.entity.VideoFileWrapper;
@@ -24,7 +25,9 @@ public class FileServiceImpl implements FileService {
 
     //////////////////////////////////////////////////////////////////////////
     public FileServiceImpl(){
-        gson = new Gson();
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        gson = builder.create();
     }
 
     //////////////////////////////////////////////////////////////////////////

@@ -310,7 +310,6 @@ public class MainScreen implements ParentScreen {
         List<VideoFileWrapper> videoFileWrappers = queueService.cleanQueue();
         if(!videoFileWrappers.isEmpty()){
            tableView.getItems().addAll(videoFileWrappers);
-
            List<VideoFileWrapper> currentVids =
                    new ArrayList<>(tableView.getItems());
 
@@ -344,6 +343,20 @@ public class MainScreen implements ParentScreen {
 
         MenuItem savePlaylist = new MenuItem("Save Playlist");
         savePlaylist.setId("menu-item");
+        savePlaylist.setOnAction((event)->{
+            TextInputDialog inputDialog = new TextInputDialog("Enter a play list name");
+            inputDialog.setTitle("Save To Play List");
+            inputDialog.setContentText("Enter a play list name:");
+            Optional<String> okWasPressed = inputDialog.showAndWait();
+
+            if(okWasPressed.isPresent()){
+                String playListName = okWasPressed.get();
+                if(playListName.length() > 0){
+                    //TODO: Implement
+                }
+            }
+        });
+
 
         MenuItem loadPlayList = new MenuItem("Load Playlist");
         loadPlayList.setId("menu-item");
@@ -356,7 +369,6 @@ public class MainScreen implements ParentScreen {
                 PlayList autoPlayList = fileService.parseToPlayList(Collections.singletonList(file),
                         fileService.getDefaultPlayListName());
                 if (!autoPlayList.getPlayListItems().isEmpty()) {
-                    // TODO: This is not loading the file's absolute path
                     autoPlayList.getPlayListItems()
                             .stream()
                             .map(PlayListItem::getLocation)

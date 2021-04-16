@@ -23,13 +23,10 @@ public class MainPlayerWindow extends Application {
     private static MainScreen mainScreen =
             (MainScreen) applicationContext.getBean("mainScreen");
 
-    private long pid;
-
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void start(Stage stage) throws Exception {
         Stage mainStage = mainScreen.buildMainStage();
-        pid = ProcessHandle.current().pid();
         mainStage.setOnCloseRequest(shutdownSequence());
         mainStage.show();
     }
@@ -41,19 +38,17 @@ public class MainPlayerWindow extends Application {
 
     //////////////////////////////////////////////////////////////////////////
     private EventHandler<WindowEvent> shutdownSequence(){
-        return (event)->{
-            Platform.runLater(()->{
-                try {
-                    applicationContext.close();
-                    this.stop();
-                    Platform.exit();
-                    System.exit(0);
+        return (event)-> Platform.runLater(()->{
+            try {
+                applicationContext.close();
+                this.stop();
+                Platform.exit();
+                System.exit(0);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        };
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 }

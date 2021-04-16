@@ -3,6 +3,7 @@ package com.player.service;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Stack;
@@ -47,15 +48,8 @@ public class PreloaderServiceImpl implements Preloader {
     //////////////////////////////////////////////////////////////////////////
     private Future<MediaPlayer> loadFuture(File file){
         return executor.submit(()->{
-            Media media = null;
-            MediaPlayer mediaPlayer = null;
-            try {
-                media = new Media(file.toURI().toURL().toExternalForm());
-                mediaPlayer = new MediaPlayer(media);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            return mediaPlayer;
+            Media media = new Media(file.toPath().toUri().toURL().toExternalForm());
+            return new MediaPlayer(media);
         });
     }
 }
