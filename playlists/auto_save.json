@@ -3,15 +3,15 @@
   "playListItems": [
     {
       "location": {
-        "path": "/Users/gud_badoodles/Downloads/SampleVideo_1280x720_5mb.mp4"
-      },
-      "name": "SampleVideo_1280x720_5mb.mp4"
-    },
-    {
-      "location": {
         "path": "/Users/gud_badoodles/Downloads/sample_1280x720.mp4"
       },
       "name": "sample_1280x720.mp4"
+    },
+    {
+      "location": {
+        "path": "/Users/gud_badoodles/Downloads/SampleVideo_1280x720_5mb.mp4"
+      },
+      "name": "SampleVideo_1280x720_5mb.mp4"
     }
   ]
 }

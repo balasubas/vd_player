@@ -18,11 +18,14 @@ import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -341,6 +344,15 @@ public class MainScreen implements ParentScreen {
         menuBar = new MenuBar();
         menuBar.setId("menu-main");
 
+        Menu menu = new Menu("File");
+        menu.getItems().addAll(defineMenuItems());
+
+        menuBar.getMenus().add(menu);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    private List<MenuItem> defineMenuItems(){
+        List<MenuItem> menuItems = new ArrayList<>();
         MenuItem savePlaylist = new MenuItem("Save Playlist");
         savePlaylist.setId("menu-item");
         savePlaylist.setOnAction((event)->{
@@ -350,16 +362,54 @@ public class MainScreen implements ParentScreen {
             Optional<String> okWasPressed = inputDialog.showAndWait();
 
             if(okWasPressed.isPresent()){
-                String playListName = okWasPressed.get();
-                if(playListName.length() > 0){
-                    //TODO: Implement
+                boolean doSave = true;
+                String playListName = okWasPressed.get() + ".json";
+                if(StringUtils.stripToEmpty(playListName).length() > 0){
+                   Path savePath = Paths.get(appProperties.getPlaylistDir(), playListName);
+                   if(savePath.toFile().exists()){
+                      Alert fileExists = generateAlert("Playlist name already exists. Overwrite?",
+                              Alert.AlertType.CONFIRMATION);
+
+                      Optional<ButtonType> confirm = fileExists.showAndWait();
+                      if(!confirm.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE)){
+                          doSave = false;
+                      }
+                   }
+
+                   if(doSave && !tableView.getItems().isEmpty()){
+                        fileService.savePlaylist(tableView.getItems(),
+                                playListName, appProperties.getPlaylistDir());
+                   }
                 }
             }
         });
 
+        menuItems.add(savePlaylist);
 
         MenuItem loadPlayList = new MenuItem("Load Playlist");
         loadPlayList.setId("menu-item");
+        loadPlayList.setOnAction((event)->{
+            FileChooser loadChoice = new FileChooser();
+            loadChoice.setInitialDirectory(Paths.get(appProperties.getPlaylistDir()).toFile());
+            File choice = loadChoice.showOpenDialog(primaryStage);
+            if(Objects.nonNull(choice)) {
+                List<File> loaded =
+                        fileService.loadPlaylist(choice.getName(), appProperties.getPlaylistDir());
+                PlayList autoPlayList = fileService.parseToPlayList(loaded, choice.getName());
+
+                if (!autoPlayList.getPlayListItems().isEmpty()) {
+                    tableView.getItems().clear();
+                    autoPlayList.getPlayListItems()
+                            .stream()
+                            .map(PlayListItem::getLocation)
+                            .forEach((fileItem)->{
+                                queueService.addToMediaQueue(fileItem);
+                            });
+                }
+            }
+        });
+
+        menuItems.add(loadPlayList);
 
         MenuItem loadAutoSaved = new MenuItem("Load Auto Saved");
         loadAutoSaved.setId("menu-item");
@@ -379,9 +429,16 @@ public class MainScreen implements ParentScreen {
             }
         });
 
-        Menu menu = new Menu("File");
+        menuItems.add(loadAutoSaved);
 
-        menu.getItems().addAll(savePlaylist,loadPlayList,loadAutoSaved);
-        menuBar.getMenus().add(menu);
+        MenuItem deletePlaylist = new MenuItem("Delete A Playlist");
+        deletePlaylist.setId("menu-item");
+        deletePlaylist.setOnAction((event)->{
+            // Todo: Implement
+        });
+
+        menuItems.add(deletePlaylist);
+
+        return menuItems;
     }
 }

@@ -2,6 +2,7 @@ package com.player.ui;
 
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
@@ -55,6 +56,13 @@ public interface ParentScreen {
         slider.setShowTickMarks(true);
 
         return slider;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    default Alert generateAlert(String message, Alert.AlertType alertType){
+        Alert alert = new Alert(alertType);
+        alert.setContentText(message);
+        return alert;
     }
 
 }
