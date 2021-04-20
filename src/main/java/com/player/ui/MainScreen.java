@@ -18,12 +18,17 @@ import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -434,7 +439,41 @@ public class MainScreen implements ParentScreen {
         MenuItem deletePlaylist = new MenuItem("Delete A Playlist");
         deletePlaylist.setId("menu-item");
         deletePlaylist.setOnAction((event)->{
-            // Todo: Implement
+            List<File> files = null;
+            List<String> fileNames = new ArrayList<>();
+            fileNames.add("None");
+            try {
+                files = Files.list(Paths.get(appProperties.getPlaylistDir()))
+                                        .map(Path::toFile)
+                                        .filter((file)-> file.getName().endsWith(".json"))
+                                        .filter((file)-> !file.getName().startsWith("auto_save"))
+                                        .collect(Collectors.toList());
+
+                fileNames.addAll(files.stream()
+                                 .map((file)-> file.getName().replace(".json",""))
+                                 .collect(Collectors.toList()));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ChoiceDialog<String> choiceDialog = new ChoiceDialog<String>(fileNames.get(0),fileNames);
+            choiceDialog.setTitle("Delete A Playlist");
+            choiceDialog.setContentText("Choose A Playlist To Delete");
+            choiceDialog.showAndWait();
+            String chosen = choiceDialog.getSelectedItem();
+            assert files != null;
+            Optional<File> toDelete = files.stream()
+                                           .filter((file)-> file.getName().startsWith(chosen))
+                                           .findFirst();
+
+            if(toDelete.isPresent()){
+                try {
+                    FileUtils.forceDelete(toDelete.get());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         });
 
         menuItems.add(deletePlaylist);
