@@ -49,6 +49,9 @@ public class ApplicationProperties {
     @Value("${playlist.dir}")
     private String playlistSubdir;
 
+    @Value("${output.to.console}")
+    private boolean outToConsole;
+
     //////////////////////////////////////////////////////////////////////////
     public int getStdHeight() {
         return stdHeight;
@@ -151,4 +154,8 @@ public class ApplicationProperties {
         return currDir + playlistSubdir;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    public boolean isOutToConsole() {
+        return outToConsole;
+    }
 }
