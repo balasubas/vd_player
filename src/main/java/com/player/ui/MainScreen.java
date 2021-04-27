@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -78,7 +80,7 @@ public class MainScreen implements ParentScreen {
     private Stage primaryStage;
     private Slider slider;
     private MenuBar menuBar;
-
+    private static Logger logger;
 
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
@@ -351,6 +353,7 @@ public class MainScreen implements ParentScreen {
         menu.getItems().addAll(defineMenuItems());
 
         menuBar.getMenus().add(menu);
+        logger = LogManager.getLogger(MainScreen.class);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -396,6 +399,7 @@ public class MainScreen implements ParentScreen {
             loadChoice.setInitialDirectory(Paths.get(appProperties.getPlaylistDir()).toFile());
             File choice = loadChoice.showOpenDialog(primaryStage);
             if(Objects.nonNull(choice)) {
+                logger.info("Loading play list: " + choice.getName());
                 List<File> loaded =
                         fileService.loadPlaylist(choice.getName(), appProperties.getPlaylistDir());
                 PlayList autoPlayList = fileService.parseToPlayList(loaded, choice.getName());
