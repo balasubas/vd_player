@@ -6,6 +6,8 @@ import com.player.entity.PlayList;
 import com.player.entity.PlayListItem;
 import com.player.entity.VideoFileWrapper;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +24,14 @@ public class FileServiceImpl implements FileService {
 
     private final String DEFAULT_PLAYLIST_NAME = "auto_save.json";
     private Gson gson;
+    private static Logger logger;
 
     //////////////////////////////////////////////////////////////////////////
     public FileServiceImpl(){
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
         gson = builder.create();
+        logger = LogManager.getLogger(FileService.class);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -95,7 +99,7 @@ public class FileServiceImpl implements FileService {
                 FileUtils.deleteQuietly(file);
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
 
@@ -108,8 +112,9 @@ public class FileServiceImpl implements FileService {
 
         try {
             FileUtils.writeStringToFile(file,jsonString, Charset.defaultCharset());
+            logger.info("Saving playlist: " + file.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -131,7 +136,7 @@ public class FileServiceImpl implements FileService {
                         .collect(Collectors.toList());
 
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
 

@@ -38,21 +38,7 @@ public class MainPlayerWindow extends Application {
     //////////////////////////////////////////////////////////////////////////
     @Override
     public void start(Stage stage) throws Exception {
-
-        // TODO: encapsulate into it's own method
-        LogSpecification logSpecification =
-                new LogSpecification("application.log", "logs", Level.INFO, Level.INFO,
-        true, "ApplicationLogAppender");
-
-        LogSpecification logSpecificationErr =
-                new LogSpecification("error.log", "logs", Level.ERROR, Level.ERROR,
-                        true, "ErrorLogAppender");
-
-        LoggingUtils.initializeLogger(logSpecificationErr);
-        LoggingUtils.initializeLogger(logSpecification);
-
-        logger = LogManager.getLogger(MainPlayerWindow.class);
-
+        initLoggers();
         Stage mainStage = mainScreen.buildMainStage();
         mainStage.setOnCloseRequest(shutdownSequence());
         logger.info("Started the application... ");
@@ -79,6 +65,21 @@ public class MainPlayerWindow extends Application {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void initLoggers(){
+        LogSpecification logSpecification =
+                new LogSpecification("application", "logs", Level.INFO, Level.INFO,
+                        true, "ApplicationLogAppender");
+
+        LogSpecification logSpecificationErr =
+                new LogSpecification("error", "logs", Level.ERROR, Level.ERROR,
+                        true, "ErrorLogAppender");
+
+        LoggingUtils.initializeLogger(logSpecificationErr);
+        LoggingUtils.initializeLogger(logSpecification);
+
+        logger = LogManager.getLogger(MainPlayerWindow.class);
     }
 
 }

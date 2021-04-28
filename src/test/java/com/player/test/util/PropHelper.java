@@ -29,6 +29,16 @@ public class PropHelper {
     }
 
     //////////////////////////////////////////////////////////////////////////
+    public String getTestLogDirectory(){
+        return System.getProperty("user.dir") + propMap.get("log.test.dir");
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public Integer getLogMaxDays(){
+        return Integer.valueOf(propMap.get("log.max.days"));
+    }
+
+    //////////////////////////////////////////////////////////////////////////
     private Map<String,String> getPropMap(){
         Properties props = new Properties();
         try {

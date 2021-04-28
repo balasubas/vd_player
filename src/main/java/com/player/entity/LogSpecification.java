@@ -1,6 +1,10 @@
 package com.player.entity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LogSpecification {
 
@@ -16,7 +20,11 @@ public class LogSpecification {
     //////////////////////////////////////////////////////////////////////////
     public LogSpecification(String logFileName, String directory, Level logLevelMin, Level logLevelMax,
                      boolean isFileLog, String loggerName){
-        this.logFileName = logFileName;
+        String pattern = "yyyyMMdd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String dateString = simpleDateFormat.format(new Date());
+
+        this.logFileName = StringUtils.join(logFileName,"-",dateString,".log");
         this.directory = directory;
         this.logLevelMin = logLevelMin;
         this.logLevelMax = logLevelMax;

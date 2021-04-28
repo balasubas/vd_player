@@ -4,8 +4,6 @@ import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Slider;
@@ -14,6 +12,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -48,11 +48,13 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     private Slider slider;
     private boolean isPlayingFromQueue = false;
     private final Duration REWIND_CONST = new Duration(100);
+    private static Logger logger;
 
     //////////////////////////////////////////////////////////////////////////
     public PlayerServiceImpl(){
         pcs = new PropertyChangeSupport(this);
         pcs.addPropertyChangeListener(this);
+        logger = LogManager.getLogger(ConsumerService.class);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -91,7 +93,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -177,7 +179,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
             try {
                 th.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
     }

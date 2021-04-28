@@ -1,15 +1,23 @@
 package com.player.utils;
 
 import com.player.entity.LogSpecification;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.builder.api.*;
 import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
-// TODO: Add console appender method. See how to use multiple loggers
 public class LoggingUtils {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
@@ -40,22 +48,31 @@ public class LoggingUtils {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    // TODO: Depreacate this
-    private static AppenderComponentBuilder createAppender(String logName,
-                                                           ConfigurationBuilder<BuiltConfiguration> logConfig){
-        AppenderComponentBuilder appenderComponentBuilder = null;
-        LayoutComponentBuilder layoutBuilder = logConfig.newLayout("PatternLayout")
-                .addAttribute("pattern", "%d %p %c [%t] %m%n");
+    // TODO: Add this to the MainPlayerWindow class
+    public static void reapOldLogs(int thresholdDays, String logDirectory){
+        File logDir = new File(logDirectory);
+        if(logDir.exists() && logDir.isDirectory()){
+            Arrays.stream(Objects.requireNonNull(logDir.listFiles()))
+                  .filter((file)-> file.isFile() && file.getName().endsWith(".log")).filter((file)->{
+                      FileTime creationTime = null;
+                      try {
+                         creationTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
+                      } catch (IOException e) {
+                         e.printStackTrace();
+                      }
 
-        if(Objects.nonNull(logName)){
-            appenderComponentBuilder = logConfig.newAppender(DEFAULT_FILE_LOGGER_NAME, "File");
-            appenderComponentBuilder.addAttribute("fileName",logName);
-        }else{
-            appenderComponentBuilder = logConfig.newAppender(DEFAULT_CONSOLE_LOGGER_NAME, "Console");
+                      assert Objects.nonNull(creationTime);
+                      Calendar calendar = Calendar.getInstance();
+                      calendar.setTimeInMillis(creationTime.toMillis());
+                      Date actualFileDate = calendar.getTime();
+
+                      Date today = new Date();
+
+                      Date thresholdDate = DateUtils.addDays(actualFileDate,thresholdDays);
+                      return DateUtils.isSameDay(thresholdDate,today);
+                  }).forEach(FileUtils::deleteQuietly);
+
         }
-
-        appenderComponentBuilder.add(layoutBuilder);
-        return appenderComponentBuilder;
     }
 
     //////////////////////////////////////////////////////////////////////////

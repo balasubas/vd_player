@@ -3,6 +3,8 @@ package com.player.service;
 import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
 import javafx.scene.media.MediaPlayer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -28,12 +30,14 @@ public class QueueServiceImpl implements QueueService {
     private Map<File, Future<MediaPlayer>> mediaQueue;
     private Map<File, Future<MediaPlayer>> tempQueue;
     private boolean mediaQueueIsBusy = false;
+    private static Logger logger;
 
     //////////////////////////////////////////////////////////////////////////
     public QueueServiceImpl(){
         mainQueue = new ConcurrentLinkedQueue<>();
         mediaQueue = new ConcurrentHashMap<>();
         tempQueue = new HashMap<>();
+        logger = LogManager.getLogger(QueueService.class);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -101,6 +105,7 @@ public class QueueServiceImpl implements QueueService {
                 VideoFileWrapper videoFileWrapper =
                         new VideoFileWrapper(new File(appProperties.getThumbNail("camera")),
                                 file, mediaPlayerFuture);
+                logger.info("Loading video: " + file.getName());
                 done.add(videoFileWrapper);
             }
         }

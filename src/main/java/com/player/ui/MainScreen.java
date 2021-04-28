@@ -456,7 +456,7 @@ public class MainScreen implements ParentScreen {
                                  .collect(Collectors.toList()));
 
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
 
             ChoiceDialog<String> choiceDialog = new ChoiceDialog<String>(fileNames.get(0),fileNames);
@@ -471,9 +471,11 @@ public class MainScreen implements ParentScreen {
 
             if(toDelete.isPresent()){
                 try {
-                    FileUtils.forceDelete(toDelete.get());
+                    File fileToDelete = toDelete.get();
+                    logger.info("Deleting playlist: " + fileToDelete.getName());
+                    FileUtils.forceDelete(fileToDelete);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
                 }
             }
         });
