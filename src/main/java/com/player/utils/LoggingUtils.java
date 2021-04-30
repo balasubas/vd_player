@@ -65,11 +65,11 @@ public class LoggingUtils {
                       Calendar calendar = Calendar.getInstance();
                       calendar.setTimeInMillis(creationTime.toMillis());
                       Date actualFileDate = calendar.getTime();
-
                       Date today = new Date();
+                      Date thresholdDate = DateUtils.addDays(today,(thresholdDays * -1));
+                      int result = Long.compare(actualFileDate.getTime(), thresholdDate.getTime());
 
-                      Date thresholdDate = DateUtils.addDays(actualFileDate,thresholdDays);
-                      return DateUtils.isSameDay(thresholdDate,today);
+                      return result < 1;
                   }).forEach(FileUtils::deleteQuietly);
 
         }
