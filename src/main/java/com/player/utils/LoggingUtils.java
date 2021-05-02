@@ -48,7 +48,6 @@ public class LoggingUtils {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    // TODO: Add this to the MainPlayerWindow class
     public static void reapOldLogs(int thresholdDays, String logDirectory){
         File logDir = new File(logDirectory);
         if(logDir.exists() && logDir.isDirectory()){

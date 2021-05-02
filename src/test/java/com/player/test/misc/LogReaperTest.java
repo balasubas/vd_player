@@ -4,6 +4,7 @@ import com.player.test.util.PropHelper;
 import com.player.utils.LoggingUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -15,8 +16,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 
 
 public class LogReaperTest {
@@ -69,19 +73,29 @@ public class LogReaperTest {
             e.printStackTrace();
         }
 
-        Date futureDate = DateUtils.addDays(new Date(),propHelper.getLogMaxDays() * -1);
+        Date futureDate = DateUtils.addDays(new Date(), (propHelper.getLogMaxDays() + 1) * -1);
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        String formatted = StringUtils.join(format.format(futureDate),"1200");
-        String command = "touch -t " + formatted + " " + expiredFile.getAbsolutePath();
+        String formatted = StringUtils.join(format.format(futureDate), "1200");
 
-        Runtime run  = Runtime.getRuntime();
-        try {
-            Process proc = run.exec(command);
-            proc.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        // Set the new created date.
+        if(SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_LINUX) {
+            String command = "touch -t " + formatted + " " + expiredFile.getAbsolutePath();
+            Runtime run = Runtime.getRuntime();
+            try {
+                Process proc = run.exec(command);
+                proc.waitFor();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                Files.setAttribute(expiredFile.toPath(), "basic:creationTime",
+                        FileTime.fromMillis(futureDate.getTime()),
+                        NOFOLLOW_LINKS);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
 }

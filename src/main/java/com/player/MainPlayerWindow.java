@@ -55,6 +55,8 @@ public class MainPlayerWindow extends Application {
     private EventHandler<WindowEvent> shutdownSequence(){
         return (event)-> Platform.runLater(()->{
             try {
+                LoggingUtils.reapOldLogs(applicationProperties.getMaxLogDays(),
+                        applicationProperties.getLogDir());
                 logger.info("Closing application... ");
                 applicationContext.close();
                 this.stop();
@@ -67,6 +69,7 @@ public class MainPlayerWindow extends Application {
         });
     }
 
+    //////////////////////////////////////////////////////////////////////////
     private void initLoggers(){
         LogSpecification logSpecification =
                 new LogSpecification("application", "logs", Level.INFO, Level.INFO,

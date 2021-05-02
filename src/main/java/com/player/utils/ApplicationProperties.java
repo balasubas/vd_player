@@ -52,6 +52,14 @@ public class ApplicationProperties {
     @Value("${output.to.console}")
     private boolean outToConsole;
 
+    @Value("${log.max.days}")
+    private Integer maxLogDays;
+
+    @Value("${log.dir}")
+    private String logDir;
+
+    private String currDir = System.getProperty("user.dir");
+
     //////////////////////////////////////////////////////////////////////////
     public int getStdHeight() {
         return stdHeight;
@@ -150,12 +158,21 @@ public class ApplicationProperties {
 
     //////////////////////////////////////////////////////////////////////////
     public String getPlaylistDir(){
-        String currDir = System.getProperty("user.dir");
         return currDir + playlistSubdir;
     }
 
     //////////////////////////////////////////////////////////////////////////
     public boolean isOutToConsole() {
         return outToConsole;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public Integer getMaxLogDays() {
+        return maxLogDays;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public String getLogDir() {
+        return currDir + logDir;
     }
 }
