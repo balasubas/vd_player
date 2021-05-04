@@ -1,5 +1,6 @@
 package com.player.ui;
 
+import com.player.entity.AudioControls;
 import com.player.entity.PlayList;
 import com.player.entity.PlayListItem;
 import com.player.entity.VideoFileWrapper;
@@ -79,6 +80,7 @@ public class MainScreen implements ParentScreen {
     private Map<File,Future<MediaPlayer>> mediaQueue;
     private Stage primaryStage;
     private Slider slider;
+    private Slider volumeSlider;
     private MenuBar menuBar;
     private static Logger logger;
 
@@ -142,13 +144,25 @@ public class MainScreen implements ParentScreen {
         VBox rightSide = new VBox(new Label("Now Playing ... "));
         HBox hBox = configureVidControls();
 
-        slider = builStandardSlider( "slide", 0, 100, 0.5, 25, 1000);
+        slider = builStandardSlider( "slide", 0, 100, 0.5, 30, 1000);
         consumerService.setSlider(slider);
 
         gridPane = new GridPane();
         gridPane.setMinHeight(gridPaneHeight);
 
-        rightSide.getChildren().addAll(menuBar,gridPane,slider,hBox);
+        HBox volHbox = new HBox();
+        volHbox.setSpacing(15.0);
+        volumeSlider = builStandardSlider( "vol-slide", 0, 100, 0.0, 30, 500);
+        RadioButton muteBtn = new RadioButton("Mute");
+        AudioControls audioControls = new AudioControls(volumeSlider, muteBtn);
+        volHbox.getChildren().addAll(new Label("    Volume:"),volumeSlider,muteBtn);
+
+        consumerService.setAudioControls(audioControls);
+
+        VBox controlsVbox = new VBox();
+        controlsVbox.getChildren().addAll(slider,new Label(),volHbox);
+
+        rightSide.getChildren().addAll(menuBar,gridPane,controlsVbox,hBox);
 
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(leftSide,rightSide);

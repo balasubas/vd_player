@@ -19,6 +19,12 @@
   -fx-border-width: 1px;
 }
 
+#vol-slide{
+  -fx-background-color: #1E90FF;
+  -fx-border-color: black;
+  -fx-border-width: 1px;
+}
+
 #open-btn{
   -fx-font-size: 18pt;
   -fx-background-color: #1E90FF;

@@ -1,5 +1,6 @@
 package com.player.service;
 
+import com.player.entity.AudioControls;
 import com.player.entity.Player;
 import com.player.entity.VideoFileWrapper;
 import com.player.utils.ApplicationProperties;
@@ -46,6 +47,7 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     private PropertyChangeSupport pcs;
     private Pane pane;
     private Slider slider;
+    private  AudioControls audioControls;
     private boolean isPlayingFromQueue = false;
     private final Duration REWIND_CONST = new Duration(100);
     private static Logger logger;
@@ -90,6 +92,13 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
                 });
 
                 currentPlayer.play();
+
+                // TODO: implement muting
+                audioControls.setSliderValue(currentPlayer.getMediaPlayer().getVolume());
+                audioControls.getVolumeSlider().valueProperty().addListener((changed)->{
+                    currentPlayer.getMediaPlayer().setVolume(audioControls.getVolumeSlider().getValue());
+                });
+
             }
 
         } catch (IOException e) {
@@ -215,6 +224,12 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
     @Override
     public void setSlider(Slider slider) {
         this.slider = slider;
+    }
+
+    //////////////////////////////////////////////////////////////////////////s
+    @Override
+    public void setAudioControls(AudioControls audioControls) {
+        this.audioControls = audioControls;
     }
 
     //////////////////////////////////////////////////////////////////////////
