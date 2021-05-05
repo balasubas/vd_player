@@ -93,10 +93,25 @@ public class PlayerServiceImpl implements ConsumerService, PropertyChangeListene
 
                 currentPlayer.play();
 
-                // TODO: implement muting
+                if(audioControls.isMute()){
+                    currentPlayer.getMediaPlayer().setVolume(0.0);
+                }
+
                 audioControls.setSliderValue(currentPlayer.getMediaPlayer().getVolume());
-                audioControls.getVolumeSlider().valueProperty().addListener((changed)->{
-                    currentPlayer.getMediaPlayer().setVolume(audioControls.getVolumeSlider().getValue());
+                audioControls.getVolumeSlider().valueProperty().addListener((changed)-> {
+                    if(!audioControls.isMute()) {
+                        currentPlayer.getMediaPlayer().setVolume(audioControls.getCurrentSliderValue());
+                    }
+                });
+
+                audioControls.getMuteBtn().selectedProperty().addListener((changed)->{
+                    if(audioControls.isMute()){
+                        audioControls.setMutBtnText("Unmute");
+                        currentPlayer.getMediaPlayer().setVolume(0.0);
+                    }else{
+                        audioControls.setMutBtnText("Mute");
+                        currentPlayer.getMediaPlayer().setVolume(audioControls.getVolumeSlider().getValue());
+                    }
                 });
 
             }

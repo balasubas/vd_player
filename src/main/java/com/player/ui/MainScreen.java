@@ -141,7 +141,8 @@ public class MainScreen implements ParentScreen {
         leftSide.setMaxWidth(leftPaneWidth);
         leftSide.setMinWidth(leftPaneWidth);
 
-        VBox rightSide = new VBox(new Label("Now Playing ... "));
+        VBox rightSide = new VBox();
+        rightSide.setSpacing(10.0);
         HBox hBox = configureVidControls();
 
         slider = builStandardSlider( "slide", 0, 100, 0.5, 30, 1000);
@@ -151,16 +152,19 @@ public class MainScreen implements ParentScreen {
         gridPane.setMinHeight(gridPaneHeight);
 
         HBox volHbox = new HBox();
-        volHbox.setSpacing(15.0);
-        volumeSlider = builStandardSlider( "vol-slide", 0, 100, 0.0, 30, 500);
+        volHbox.setSpacing(10.0);
+        volumeSlider = builStandardSlider( "vol-slide", 0, 10, 0.0, 30, 500);
+
         RadioButton muteBtn = new RadioButton("Mute");
+        muteBtn.setId("mute-btn");
         AudioControls audioControls = new AudioControls(volumeSlider, muteBtn);
         volHbox.getChildren().addAll(new Label("    Volume:"),volumeSlider,muteBtn);
 
         consumerService.setAudioControls(audioControls);
 
         VBox controlsVbox = new VBox();
-        controlsVbox.getChildren().addAll(slider,new Label(),volHbox);
+        controlsVbox.setSpacing(10.0);
+        controlsVbox.getChildren().addAll(slider,volHbox);
 
         rightSide.getChildren().addAll(menuBar,gridPane,controlsVbox,hBox);
 

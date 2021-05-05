@@ -19,10 +19,29 @@
   -fx-border-width: 1px;
 }
 
+#slide .thumb {
+   -fx-background-color: white;
+}
+
 #vol-slide{
   -fx-background-color: #1E90FF;
   -fx-border-color: black;
   -fx-border-width: 1px;
+}
+
+#vol-slide .thumb {
+   -fx-background-color: white;
+}
+
+
+#mute-btn:selected .radio .dot{
+  -fx-background-color: red;
+  -fx-background-insets: 0;
+}
+
+#mute-btn .radio .dot{
+  -fx-background-color: linear-gradient(#7474bf,#348ac7);
+  -fx-background-insets: 0;
 }
 
 #open-btn{

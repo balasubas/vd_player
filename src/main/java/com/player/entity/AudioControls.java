@@ -47,8 +47,13 @@ public class AudioControls {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    public void setMuteBtnValue(boolean selected){
-        muteBtn.setSelected(selected);
+    public RadioButton getMuteBtn(){
+        return this.muteBtn;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    public void setMutBtnText(String text){
+        this.muteBtn.setText(text);
     }
 
 }
