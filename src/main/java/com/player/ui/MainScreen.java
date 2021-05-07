@@ -87,9 +87,6 @@ public class MainScreen implements ParentScreen {
     //////////////////////////////////////////////////////////////////////////
     public Stage buildMainStage(){
         init();
-        mediaQueue = new ConcurrentHashMap<>();
-        primaryStage = new Stage();
-        chooser = new FileChooser();
         VBox leftSide = configureLeftPanel(new VBox(new Label("Video Files")));
         Button open = new Button("+");
         Button clear = new Button("clear");
@@ -358,6 +355,12 @@ public class MainScreen implements ParentScreen {
 
     //////////////////////////////////////////////////////////////////////////
     private void init(){
+        mediaQueue = new ConcurrentHashMap<>();
+        primaryStage = new Stage();
+        chooser = new FileChooser();
+        chooser.getExtensionFilters()
+               .add(new FileChooser.ExtensionFilter("Video Files","*.mp4"));
+
         progressWindow.init();
         File playlistDir = new File(appProperties.getPlaylistDir());
         if(!playlistDir.exists()){

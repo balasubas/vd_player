@@ -1,10 +1,7 @@
 package com.player.entity;
 
-import javafx.beans.InvalidationListener;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
-
-import javax.swing.event.ChangeListener;
 
 public class AudioControls {
 

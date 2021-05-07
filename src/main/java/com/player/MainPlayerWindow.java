@@ -32,7 +32,6 @@ public class MainPlayerWindow extends Application {
     private static ApplicationProperties applicationProperties =
             (ApplicationProperties) applicationContext.getBean("appProperties");
 
-    private static final String applicationLogsName = "";
     private static Logger logger;
 
     //////////////////////////////////////////////////////////////////////////
