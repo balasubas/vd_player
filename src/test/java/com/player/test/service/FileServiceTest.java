@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// TODO: issue between jdk 16 and gson
+// TODO: on commandline, you're gonna have to set JAVA to JDK 11
+//       example:  export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home
 public class FileServiceTest {
 
     //////////////////////////////  DECLARATIONS  /////////////////////////////
@@ -53,6 +56,7 @@ public class FileServiceTest {
             Paths.get(propHelper.getTempFileDirectory()).toFile().mkdir();
         }
 
+        // TODO: failing here.
         fileService.savePlaylist(wrappers,stdName,propHelper.getTempFileDirectory());
         fileService.saveDefaultPlaylist(wrappers,propHelper.getTempFileDirectory());
     }
